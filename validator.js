@@ -193,3 +193,6 @@ RECOMMENDED NEXT STEPS:
 4. Consider bid-ask spread (market price is often mid-point)
 5. Add more sophisticated models (jump diffusion, stochastic vol)
 `);
+
+// Export functions for use in other modules
+module.exports = { calculateGreeks, impliedVolatility, analyzeOption };
