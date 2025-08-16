@@ -1,0 +1,28 @@
+{
+  "createdDate": "2025-08-16T13:50:21.362Z",
+  "description": "Realistic synthetic market data for validation testing",
+  "totalOptions": 1137,
+  "bySymbol": {
+    "SPY": {
+      "stockPrice": 560.61,
+      "optionCount": 385,
+      "calls": 198,
+      "puts": 187,
+      "avgImpliedVol": 0.2604953887550836
+    },
+    "QQQ": {
+      "stockPrice": 489.32,
+      "optionCount": 383,
+      "calls": 194,
+      "puts": 189,
+      "avgImpliedVol": 0.3061858223843488
+    },
+    "AAPL": {
+      "stockPrice": 229.87,
+      "optionCount": 369,
+      "calls": 191,
+      "puts": 178,
+      "avgImpliedVol": 0.33850206612594497
+    }
+  }
+}

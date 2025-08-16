@@ -1,0 +1,11 @@
+{
+  "SPY": {
+    "error": "Unexpected token 'T', \"Too Many Requests\r\n\" is not valid JSON"
+  },
+  "QQQ": {
+    "error": "Unexpected token 'T', \"Too Many Requests\r\n\" is not valid JSON"
+  },
+  "AAPL": {
+    "error": "Unexpected token 'T', \"Too Many Requests\r\n\" is not valid JSON"
+  }
+}
