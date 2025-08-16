@@ -4,13 +4,44 @@
   "description": "Professional vanilla JavaScript library for options pricing using binomial and Black-Scholes models",
   "type": "module",
   "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "exports": {
-    ".": "./lib/index.js",
-    "./core": "./src/core/binomial.js",
-    "./blackscholes": "./src/core/blackscholes.js",
-    "./option": "./src/models/option.js",
-    "./dividends": "./src/utils/dividends.js",
-    "./greeks": "./src/utils/greeks.js"
+    ".": {
+      "import": "./lib/index.js",
+      "types": "./lib/index.d.ts"
+    },
+    "./core": {
+      "import": "./src/core/binomial.js",
+      "types": "./src/core/binomial.d.ts"
+    },
+    "./blackscholes": {
+      "import": "./src/core/blackscholes.js",
+      "types": "./src/core/blackscholes.d.ts"
+    },
+    "./trinomial": {
+      "import": "./src/core/trinomial.js",
+      "types": "./src/core/trinomial.d.ts"
+    },
+    "./jumpdiffusion": {
+      "import": "./src/core/jumpdiffusion.js",
+      "types": "./src/core/jumpdiffusion.d.ts"
+    },
+    "./montecarlo": {
+      "import": "./src/core/montecarlo.js",
+      "types": "./src/core/montecarlo.d.ts"
+    },
+    "./option": {
+      "import": "./src/models/option.js",
+      "types": "./src/models/option.d.ts"
+    },
+    "./dividends": {
+      "import": "./src/utils/dividends.js",
+      "types": "./src/utils/dividends.d.ts"
+    },
+    "./greeks": {
+      "import": "./src/utils/greeks.js",
+      "types": "./src/utils/greeks.d.ts"
+    }
   },
   "files": [
     "lib/",
@@ -18,10 +49,15 @@
     "examples/",
     "docs/",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "*.d.ts"
   ],
   "scripts": {
-    "test": "node tests/test.cjs",
+    "test": "node tests/run-unit-tests.js",
+    "test:legacy": "node tests/test.cjs",
+    "test:unit": "node --test --test-reporter=spec tests/unit.test.js",
+    "test:coverage": "node --test --experimental-test-coverage tests/unit.test.js",
+    "test:all": "npm run test:unit && npm run test:legacy && npm run validate",
     "validate": "node tests/validate-real-market.cjs",
     "example": "node examples/basic-usage.js",
     "docs": "node scripts/generate-docs.js"
@@ -32,6 +68,9 @@
     "finance",
     "binomial",
     "black-scholes",
+    "trinomial",
+    "jump-diffusion",
+    "monte-carlo",
     "options-pricing",
     "greeks",
     "implied-volatility",

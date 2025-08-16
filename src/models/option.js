@@ -6,6 +6,9 @@
 
 import { binomialPrice } from '../core/binomial.js';
 import { blackScholesPrice, blackScholesGreeks } from '../core/blackscholes.js';
+import { trinomialPrice, trinomialGreeks } from '../core/trinomial.js';
+import { jumpDiffusionPrice, jumpDiffusionGreeks, jumpDiffusionJumpGreeks, getDefaultJumpParams } from '../core/jumpdiffusion.js';
+import { monteCarloPrice, monteCarloGreeks, adaptiveMonteCarloPrice } from '../core/montecarlo.js';
 import { getDividendYield } from '../utils/dividends.js';
 import { calculateGreeks } from '../utils/greeks.js';
 
@@ -136,6 +139,174 @@ export class Option {
     }
 
     /**
+     * Calculate trinomial option price
+     * @param {number} [steps=50] - Number of trinomial steps
+     * @returns {number} Option price
+     */
+    trinomialPrice(steps = 50) {
+        return trinomialPrice({
+            stockPrice: this.stockPrice,
+            strikePrice: this.strikePrice,
+            timeToExpiry: this.timeToExpiry,
+            riskFreeRate: this.riskFreeRate,
+            volatility: this.volatility,
+            dividendYield: this.dividendYield,
+            optionType: this.optionType,
+            exerciseStyle: this.exerciseStyle,
+            steps: steps
+        });
+    }
+
+    /**
+     * Calculate trinomial Greeks using numerical differentiation
+     * @param {number} [steps=50] - Number of trinomial steps
+     * @returns {Object} Greeks values
+     */
+    trinomialGreeks(steps = 50) {
+        return trinomialGreeks({
+            stockPrice: this.stockPrice,
+            strikePrice: this.strikePrice,
+            timeToExpiry: this.timeToExpiry,
+            riskFreeRate: this.riskFreeRate,
+            volatility: this.volatility,
+            dividendYield: this.dividendYield,
+            optionType: this.optionType,
+            exerciseStyle: this.exerciseStyle,
+            steps: steps
+        });
+    }
+
+    /**
+     * Calculate option price using Jump Diffusion model
+     * @param {Object} [jumpParams] - Jump diffusion parameters
+     * @param {number} [jumpParams.jumpIntensity] - Expected jumps per year
+     * @param {number} [jumpParams.jumpMean] - Mean log jump size
+     * @param {number} [jumpParams.jumpVolatility] - Jump volatility
+     * @param {string} [assetClass='equity'] - Asset class for default parameters
+     * @returns {number} Option price
+     */
+    jumpDiffusionPrice(jumpParams = {}, assetClass = 'equity') {
+        const defaults = getDefaultJumpParams(assetClass);
+        const params = { ...defaults, ...jumpParams };
+        
+        return jumpDiffusionPrice({
+            stockPrice: this.stockPrice,
+            strikePrice: this.strikePrice,
+            timeToExpiry: this.timeToExpiry,
+            riskFreeRate: this.riskFreeRate,
+            volatility: this.volatility,
+            dividendYield: this.dividendYield,
+            optionType: this.optionType,
+            ...params
+        });
+    }
+
+    /**
+     * Calculate Greeks using Jump Diffusion model
+     * @param {Object} [jumpParams] - Jump diffusion parameters
+     * @param {string} [assetClass='equity'] - Asset class for default parameters
+     * @returns {Object} Greeks values
+     */
+    jumpDiffusionGreeks(jumpParams = {}, assetClass = 'equity') {
+        const defaults = getDefaultJumpParams(assetClass);
+        const params = { ...defaults, ...jumpParams };
+        
+        return jumpDiffusionGreeks({
+            stockPrice: this.stockPrice,
+            strikePrice: this.strikePrice,
+            timeToExpiry: this.timeToExpiry,
+            riskFreeRate: this.riskFreeRate,
+            volatility: this.volatility,
+            dividendYield: this.dividendYield,
+            optionType: this.optionType,
+            ...params
+        });
+    }
+
+    /**
+     * Calculate jump-specific sensitivities
+     * @param {Object} [jumpParams] - Jump diffusion parameters
+     * @param {string} [assetClass='equity'] - Asset class for default parameters
+     * @returns {Object} Jump sensitivities
+     */
+    jumpSensitivities(jumpParams = {}, assetClass = 'equity') {
+        const defaults = getDefaultJumpParams(assetClass);
+        const params = { ...defaults, ...jumpParams };
+        
+        return jumpDiffusionJumpGreeks({
+            stockPrice: this.stockPrice,
+            strikePrice: this.strikePrice,
+            timeToExpiry: this.timeToExpiry,
+            riskFreeRate: this.riskFreeRate,
+            volatility: this.volatility,
+            dividendYield: this.dividendYield,
+            optionType: this.optionType,
+            ...params
+        });
+    }
+
+    /**
+     * Calculate option price using Monte Carlo simulation
+     * @param {Object} [mcParams] - Monte Carlo parameters
+     * @param {number} [mcParams.simulations=100000] - Number of simulations
+     * @param {boolean} [mcParams.useAntithetic=true] - Use antithetic variance reduction
+     * @param {boolean} [mcParams.useControlVariate=true] - Use control variate
+     * @param {number} [mcParams.timeSteps=1] - Number of time steps
+     * @param {number} [mcParams.seed] - Random seed for reproducibility
+     * @returns {Object} Monte Carlo pricing results with confidence intervals
+     */
+    monteCarloPrice(mcParams = {}) {
+        return monteCarloPrice({
+            stockPrice: this.stockPrice,
+            strikePrice: this.strikePrice,
+            timeToExpiry: this.timeToExpiry,
+            riskFreeRate: this.riskFreeRate,
+            volatility: this.volatility,
+            dividendYield: this.dividendYield,
+            optionType: this.optionType,
+            ...mcParams
+        });
+    }
+
+    /**
+     * Calculate Greeks using Monte Carlo simulation
+     * @param {Object} [mcParams] - Monte Carlo parameters
+     * @returns {Object} Monte Carlo Greeks
+     */
+    monteCarloGreeks(mcParams = {}) {
+        return monteCarloGreeks({
+            stockPrice: this.stockPrice,
+            strikePrice: this.strikePrice,
+            timeToExpiry: this.timeToExpiry,
+            riskFreeRate: this.riskFreeRate,
+            volatility: this.volatility,
+            dividendYield: this.dividendYield,
+            optionType: this.optionType,
+            ...mcParams
+        });
+    }
+
+    /**
+     * Calculate option price using adaptive Monte Carlo with convergence criteria
+     * @param {number} [targetError=0.01] - Target standard error
+     * @param {number} [maxSimulations=1000000] - Maximum simulations
+     * @param {Object} [mcParams] - Additional Monte Carlo parameters
+     * @returns {Object} Adaptive Monte Carlo results with convergence info
+     */
+    adaptiveMonteCarloPrice(targetError = 0.01, maxSimulations = 1000000, mcParams = {}) {
+        return adaptiveMonteCarloPrice({
+            stockPrice: this.stockPrice,
+            strikePrice: this.strikePrice,
+            timeToExpiry: this.timeToExpiry,
+            riskFreeRate: this.riskFreeRate,
+            volatility: this.volatility,
+            dividendYield: this.dividendYield,
+            optionType: this.optionType,
+            ...mcParams
+        }, targetError, maxSimulations);
+    }
+
+    /**
      * Get intrinsic value of the option
      * @returns {number} Intrinsic value
      */
@@ -188,6 +359,7 @@ export class Option {
     summary() {
         const binomialPrice = this.binomialPrice();
         const blackScholesPrice = this.blackScholesPrice();
+        const trinomialPrice = this.trinomialPrice();
         const greeks = this.binomialGreeks();
         
         return {
@@ -206,9 +378,12 @@ export class Option {
             },
             pricing: {
                 binomial: binomialPrice,
+                trinomial: trinomialPrice,
                 blackScholes: blackScholesPrice,
+                jumpDiffusion: this.jumpDiffusionPrice(),
+                monteCarlo: this.monteCarloPrice({ simulations: 50000 }).price,
                 intrinsic: this.intrinsicValue(),
-                timeValue: binomialPrice - this.intrinsicValue()
+                timeValue: trinomialPrice - this.intrinsicValue()
             },
             characteristics: {
                 moneyness: this.moneyness(),

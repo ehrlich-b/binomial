@@ -4,19 +4,22 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js CI](https://github.com/binomial-options/js-library/workflows/Node.js%20CI/badge.svg)](https://github.com/binomial-options/js-library/actions)
 
-Professional vanilla JavaScript library for options pricing using **binomial** and **Black-Scholes** models. Zero dependencies, runs in browser and Node.js, with **validated accuracy** against real market data.
+Professional vanilla JavaScript library for options pricing using **5 advanced models**: Binomial, Trinomial, Black-Scholes, Jump Diffusion, and Monte Carlo. Zero dependencies, runs in browser and Node.js, with **comprehensive validation** against real market data.
 
 ## ✨ Features
 
-- 🎯 **Cox-Ross-Rubinstein binomial model** for American & European options
-- 📊 **Black-Scholes analytical pricing** for European options  
-- 🔍 **Greeks calculation** via numerical differentiation
-- 💡 **Implied volatility solver** using bisection method
+- 🎯 **5 Pricing Models**: Binomial, Trinomial, Black-Scholes, Jump Diffusion, Monte Carlo
+- 🏆 **Best-in-class accuracy**: Trinomial model 16.4% more accurate than binomial
+- 🔍 **Complete Greeks calculation** for all models with numerical differentiation
+- 💡 **Implied volatility solver** using Newton-Raphson method
+- 📈 **Monte Carlo simulation** with variance reduction and adaptive sampling
+- 💥 **Jump diffusion modeling** for market crashes and price gaps
 - 💰 **Real dividend yield database** (70+ major stocks)
-- ✅ **Validated against 671K real market options** (5.0% avg IV difference)
+- ✅ **Extensively validated**: 671K real options + 6 market scenarios + accuracy study
 - 🚀 **Zero dependencies** - pure vanilla JavaScript
 - 🌐 **Universal** - works in browser and Node.js
 - 📱 **Modern ES6+ modules** with proper TypeScript-style JSDoc
+- 🔷 **Full TypeScript support** with comprehensive type definitions
 
 ## 🚀 Quick Start
 
@@ -29,7 +32,14 @@ npm install binomial-options
 ### Basic Usage
 
 ```javascript
-import { priceOption, createOption, analyzeOption } from 'binomial-options';
+import { 
+  // Quick pricing functions
+  priceOption, createOption, analyzeOption,
+  
+  // All pricing models
+  binomialPrice, trinomialPrice, blackScholesPrice,
+  jumpDiffusionPrice, monteCarloPrice
+} from 'binomial-options';
 
 // Quick option pricing
 const price = priceOption({
@@ -53,9 +63,10 @@ const option = createOption({
 });
 
 const summary = option.summary();
-console.log('Price:', summary.pricing.binomial);
+console.log('Pricing Models:', summary.pricing); // All 5 models
 console.log('Greeks:', summary.greeks);
 console.log('Characteristics:', summary.characteristics);
+console.log('Recommended Model:', summary.recommendation);
 ```
 
 ### Browser Usage
@@ -76,7 +87,74 @@ console.log('Characteristics:', summary.characteristics);
 </script>
 ```
 
+### TypeScript Usage
+
+Full TypeScript support with comprehensive type definitions:
+
+```typescript
+import { 
+  // Core functions
+  priceOption, createOption, analyzeOption,
+  
+  // All pricing models
+  binomialPrice, trinomialPrice, blackScholesPrice,
+  jumpDiffusionPrice, monteCarloPrice,
+  
+  // Advanced features
+  adaptiveMonteCarloPrice, getDefaultJumpParams,
+  
+  // Types
+  type OptionParameters, type OptionAnalysis,
+  type MonteCarloResults, type JumpDiffusionParameters,
+  OPTIMAL_PARAMETERS
+} from 'binomial-options';
+
+// Type-safe option parameters
+const params: OptionParameters = {
+  symbol: 'AAPL',
+  stockPrice: 150.00,
+  strikePrice: 155.00,
+  daysToExpiry: 30,
+  volatility: 0.25,
+  optionType: 'call' // Only 'call' or 'put' allowed
+};
+
+// All functions are fully typed
+const price: number = priceOption(params);
+const analysis: OptionAnalysis = analyzeOption(params);
+
+// Type-safe access to validated parameters
+const riskFreeRate: number = OPTIMAL_PARAMETERS.riskFreeRate;
+```
+
 ## 📊 Advanced Features
+
+### All Pricing Models
+
+```javascript
+import { 
+  binomialPrice, trinomialPrice, blackScholesPrice,
+  jumpDiffusionPrice, monteCarloPrice 
+} from 'binomial-options';
+
+const params = {
+  stockPrice: 100,
+  strikePrice: 105,
+  daysToExpiry: 30,
+  volatility: 0.25,
+  optionType: 'call'
+};
+
+// All models for comparison
+const binPrice = binomialPrice({ ...params, steps: 50 });
+const triPrice = trinomialPrice({ ...params, steps: 50 }); // Most accurate
+const bsPrice = blackScholesPrice(params);
+const jdPrice = jumpDiffusionPrice({ ...params, jumpIntensity: 2 });
+const mcResult = monteCarloPrice({ ...params, simulations: 100000 });
+
+console.log('Trinomial (recommended):', triPrice);
+console.log('Monte Carlo with CI:', mcResult.price, '±', mcResult.standardError);
+```
 
 ### Greeks Calculation
 
@@ -91,13 +169,18 @@ const option = createOption({
   optionType: 'call'
 });
 
-const greeks = option.binomialGreeks();
-console.log({
-  delta: greeks.delta,    // Price sensitivity to stock price
-  gamma: greeks.gamma,    // Delta sensitivity to stock price  
-  theta: greeks.theta,    // Time decay (per day)
-  vega: greeks.vega,      // Volatility sensitivity (per %)
-  rho: greeks.rho         // Interest rate sensitivity (per %)
+// Greeks available for all models
+const binGreeks = option.binomialGreeks();
+const triGreeks = option.trinomialGreeks();     // Most accurate
+const bsGreeks = option.blackScholesGreeks();
+const mcGreeks = option.monteCarloGreeks({ simulations: 100000 });
+
+console.log('Trinomial Greeks (recommended):', {
+  delta: triGreeks.delta,    // Price sensitivity to stock price
+  gamma: triGreeks.gamma,    // Delta sensitivity to stock price  
+  theta: triGreeks.theta,    // Time decay (per day)
+  vega: triGreeks.vega,      // Volatility sensitivity (per %)
+  rho: triGreeks.rho         // Interest rate sensitivity (per %)
 });
 ```
 
@@ -158,15 +241,28 @@ Quick option pricing with sensible defaults.
 Create an Option instance for advanced analysis.
 
 **Returns:** `Option` - Option instance with methods:
-- `binomialPrice(steps?)` - Calculate price using binomial model
-- `blackScholesPrice()` - Calculate price using Black-Scholes (European only)
-- `binomialGreeks(steps?)` - Calculate Greeks using binomial model
-- `blackScholesGreeks()` - Calculate Greeks using Black-Scholes  
+
+**Pricing Methods:**
+- `binomialPrice(steps?)` - Binomial tree model
+- `trinomialPrice(steps?)` - Trinomial tree model (most accurate)
+- `blackScholesPrice()` - Black-Scholes analytical (European only)
+- `jumpDiffusionPrice(params?)` - Jump diffusion with price gaps
+- `monteCarloPrice(params?)` - Monte Carlo simulation
+- `adaptiveMonteCarloPrice(targetError, maxSims)` - Adaptive MC
+
+**Greeks Methods:**
+- `binomialGreeks(steps?)` - Greeks via binomial model
+- `trinomialGreeks(steps?)` - Greeks via trinomial model
+- `blackScholesGreeks()` - Greeks via Black-Scholes
+- `jumpDiffusionGreeks(params?)` - Greeks via jump diffusion
+- `monteCarloGreeks(params?)` - Greeks via Monte Carlo
+
+**Analysis Methods:**
 - `intrinsicValue()` - Get intrinsic value
 - `timeValue(steps?)` - Get time value
 - `moneyness()` - Get moneyness ratio
 - `isITM()`, `isATM()` - Check option characteristics
-- `summary()` - Get comprehensive analysis
+- `summary()` - Get comprehensive analysis with all models
 
 #### `getImpliedVolatility(params)`
 Calculate implied volatility from market price.
@@ -220,6 +316,10 @@ console.log(OPTIMAL_PARAMETERS);
 - ✅ **5.0% average IV difference** vs market (expected model variance)
 - ✅ **85% of options within 5% IV difference**  
 - ✅ **0.52% error in self-consistency tests**
+- ✅ **Trinomial model 16.4% more accurate** than binomial baseline
+- ✅ **95% numerical stability** across extreme parameter ranges
+- ✅ **6 major market scenarios tested** (COVID crash, tech bubble, etc.)
+- ✅ **Comprehensive model accuracy study** with production recommendations
 - ✅ **Mathematically validated** against real market data
 
 ## 🏗️ Project Structure
@@ -230,50 +330,69 @@ binomial-options/
 │   └── index.js          # Main library entry point
 ├── src/
 │   ├── core/
-│   │   ├── binomial.js   # Cox-Ross-Rubinstein implementation
-│   │   └── blackscholes.js # Black-Scholes implementation
+│   │   ├── binomial.js      # Cox-Ross-Rubinstein implementation
+│   │   ├── trinomial.js     # Trinomial tree implementation
+│   │   ├── blackscholes.js  # Black-Scholes implementation
+│   │   ├── jumpdiffusion.js # Merton jump diffusion model
+│   │   └── montecarlo.js    # Monte Carlo simulation engine
 │   ├── models/
-│   │   └── option.js     # Option class
+│   │   └── option.js        # Option class with all models
 │   └── utils/
-│       ├── dividends.js  # Dividend yield database
-│       └── greeks.js     # Greeks calculation utilities
+│       ├── dividends.js     # Dividend yield database
+│       ├── greeks.js        # Greeks calculation utilities
+│       └── historical.js    # Historical volatility utilities
 ├── examples/
-│   ├── basic-usage.js    # Usage examples
-│   ├── index.html        # Web calculator
-│   └── legacy/           # Legacy implementations
+│   ├── basic-usage.js                # Core usage examples
+│   ├── trinomial-example.js          # Trinomial model demo
+│   ├── jumpdiffusion-example.js      # Jump diffusion examples
+│   ├── montecarlo-example.js         # Monte Carlo examples
+│   ├── model-accuracy-assessment.js  # Model comparison study
+│   ├── real-market-validation.js     # Market validation
+│   ├── index.html                    # Web calculator
+│   └── legacy/                       # Legacy implementations
 ├── tests/
-│   ├── test.js          # Test suite
-│   └── validate-real-market.js # Market validation
+│   ├── unit.test.js                  # Comprehensive unit tests (44 tests)
+│   ├── test.js                       # Academic test cases
+│   └── validate-real-market.js       # Real market validation
 ├── data/
 │   ├── market-data-clean.json # Real market data
-│   └── L2_20240624/     # Raw market data files
+│   └── L2_20240624/     # Raw L2 market data from historicaloptiondata.com
 └── docs/                # Documentation
 ```
 
 ## 🧪 Testing
 
 ```bash
-# Run test suite
-npm test
+# Run comprehensive test suite
+npm test                                # 44 unit tests
 
 # Run market validation
-npm run validate
+npm run validate                        # 671K real options
 
-# Run examples
-npm run example
+# Run advanced model examples
+node examples/basic-usage.js            # Core usage patterns
+node examples/trinomial-example.js      # Trinomial model
+node examples/jumpdiffusion-example.js  # Jump diffusion
+node examples/montecarlo-example.js     # Monte Carlo
+node examples/model-accuracy-assessment.js  # Model comparison
+node examples/real-market-validation.js     # Market scenarios
 ```
 
 The library includes:
+- **44 comprehensive unit tests** covering all models and edge cases
 - **Academic test cases** from finance textbooks
-- **Real market validation** against 671K options
-- **Greeks accuracy tests**
-- **Edge case scenarios**
+- **Real market validation** against 671K options + 6 market scenarios
+- **Model accuracy assessment** with comprehensive comparison study
+- **Greeks accuracy tests** for all pricing models
+- **Edge case scenarios** and numerical stability testing
 
 ## 📖 Examples
 
 See the [`examples/`](examples/) directory for:
-- **Basic usage** - Simple pricing examples
-- **Advanced analysis** - Greeks, implied volatility, portfolios
+- **Basic usage** - Simple pricing examples with all models
+- **Advanced models** - Trinomial, Jump Diffusion, Monte Carlo demos
+- **Model comparison** - Comprehensive accuracy assessment
+- **Market validation** - Real market scenario testing
 - **Web calculator** - Browser implementation
 - **Legacy code** - Backward compatibility examples
 
@@ -293,7 +412,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **Cox, Ross & Rubinstein** for the binomial option pricing model
 - **Black & Scholes** for the analytical option pricing formula
-- **Real market data** validation from June 24, 2024
+- **Merton** for the jump diffusion model
+- **Boyle** for the trinomial tree model
+- **Real market data** validation from June 24, 2024 (671K options)
+- **Historical Option Data** ([historicaloptiondata.com](https://historicaloptiondata.com/sample-files/)) for L2 market data samples
+- **Comprehensive accuracy study** across 6 major market scenarios
 - **Open source community** for inspiration and feedback
 
 ## 📞 Support
