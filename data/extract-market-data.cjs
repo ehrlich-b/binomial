@@ -4,9 +4,20 @@
  */
 
 const fs = require('fs');
+const zlib = require('zlib');
 
 function parseCSV(filePath) {
-  const content = fs.readFileSync(filePath, 'utf8');
+  let content;
+  
+  // Handle compressed files
+  if (filePath.endsWith('.gz')) {
+    console.log(`📦 Decompressing: ${filePath}`);
+    const compressedData = fs.readFileSync(filePath);
+    content = zlib.gunzipSync(compressedData).toString('utf8');
+  } else {
+    content = fs.readFileSync(filePath, 'utf8');
+  }
+  
   const lines = content.trim().split('\n');
   const headers = lines[0].split(',');
   
@@ -30,9 +41,17 @@ function extractCleanMarketData() {
   console.log('📊 Extracting real market data from L2_20240624/');
   console.log('===============================================');
   
-  // Load the CSV files
-  const optionsData = parseCSV('/home/behrlich/repos/binomial/L2_20240624/options_20240624.csv');
-  const stockData = parseCSV('/home/behrlich/repos/binomial/L2_20240624/stockquotes_20240624.csv');
+  // Load the CSV files (handle both compressed and uncompressed)
+  const basePath = 'data/L2_20240624';
+  
+  // Try compressed file first, then uncompressed
+  let optionsPath = `${basePath}/options_20240624.csv.gz`;
+  if (!fs.existsSync(optionsPath)) {
+    optionsPath = `${basePath}/options_20240624.csv`;
+  }
+  
+  const optionsData = parseCSV(optionsPath);
+  const stockData = parseCSV(`${basePath}/stockquotes_20240624.csv`);
   
   console.log(`📈 Loaded ${optionsData.length} option contracts`);
   console.log(`📊 Loaded ${stockData.length} stock quotes`);

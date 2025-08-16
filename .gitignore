@@ -1,0 +1,33 @@
+# Large data files (>100MB)
+data/L2_20240624/options_20240624.csv
+
+# Generated files (can be recreated)
+market-data-clean.json
+validation-report.json
+
+# Compressed data files
+*.gz
+*.zip
+*.tar.gz
+
+# Large CSV files
+**/options_*.csv
+
+# Backup files
+*.bak
+*.backup
+
+# Temporary files
+*.tmp
+*.temp
+
+# Node modules (if any dependencies added later)
+node_modules/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
