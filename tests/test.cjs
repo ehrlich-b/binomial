@@ -1,9 +1,9 @@
 // Standard test cases for binomial option pricing
 // These are well-known examples from textbooks and academic papers
 
-// Load the implementations from index.js
+// Load the legacy implementation for testing
 const fs = require('fs');
-const indexCode = fs.readFileSync('./index.js', 'utf8');
+const indexCode = fs.readFileSync('./examples/legacy/index.js', 'utf8');
 eval(indexCode);
 
 // Test Case 1: Hull's Example (Options, Futures, and Other Derivatives)

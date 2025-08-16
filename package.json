@@ -1,0 +1,90 @@
+{
+  "name": "binomial-options",
+  "version": "2.0.0",
+  "description": "Professional vanilla JavaScript library for options pricing using binomial and Black-Scholes models",
+  "type": "module",
+  "main": "./lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./core": "./src/core/binomial.js",
+    "./blackscholes": "./src/core/blackscholes.js",
+    "./option": "./src/models/option.js",
+    "./dividends": "./src/utils/dividends.js",
+    "./greeks": "./src/utils/greeks.js"
+  },
+  "files": [
+    "lib/",
+    "src/",
+    "examples/",
+    "docs/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node tests/test.cjs",
+    "validate": "node tests/validate-real-market.cjs",
+    "example": "node examples/basic-usage.js",
+    "docs": "node scripts/generate-docs.js"
+  },
+  "keywords": [
+    "options",
+    "derivatives", 
+    "finance",
+    "binomial",
+    "black-scholes",
+    "options-pricing",
+    "greeks",
+    "implied-volatility",
+    "financial-mathematics",
+    "quantitative-finance",
+    "vanilla-js",
+    "no-dependencies"
+  ],
+  "author": {
+    "name": "Binomial Options Project",
+    "email": "contact@binomial-options.dev",
+    "url": "https://github.com/binomial-options/js-library"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/binomial-options/js-library.git"
+  },
+  "bugs": {
+    "url": "https://github.com/binomial-options/js-library/issues"
+  },
+  "homepage": "https://github.com/binomial-options/js-library#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browser": "./lib/index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "tests",
+    "example": "examples",
+    "doc": "docs"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/binomial-options"
+  },
+  "config": {
+    "defaultParameters": {
+      "riskFreeRate": 0.04,
+      "dayCount": 252,
+      "steps": 50,
+      "exerciseStyle": "american"
+    }
+  },
+  "validation": {
+    "marketDataDate": "2024-06-24",
+    "optionsTested": 671360,
+    "avgIVDifference": "5.0%",
+    "accuracy": "85% within 5% IV difference",
+    "selfConsistency": "0.52% error"
+  },
+  "devDependencies": {},
+  "dependencies": {},
+  "peerDependencies": {},
+  "optionalDependencies": {}
+}
