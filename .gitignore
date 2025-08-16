@@ -1,17 +1,17 @@
-# Large data files (>100MB)
+# Large uncompressed data files (>100MB) 
 data/L2_20240624/options_20240624.csv
 
 # Generated files (can be recreated)
 market-data-clean.json
 validation-report.json
 
-# Compressed data files
-*.gz
+# General compressed files (but NOT our source data)
 *.zip
 *.tar.gz
 
-# Large CSV files
+# Large CSV files (uncompressed)
 **/options_*.csv
+# But keep our compressed source data: options_20240624.csv.gz is OK
 
 # Backup files
 *.bak
