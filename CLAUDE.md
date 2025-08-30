@@ -1,12 +1,20 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code when working with this **professional JavaScript options pricing library**.
+This file provides guidance to Claude Code when working with this **options education platform project**.
 
 ## Project Overview
 
-This is a **comprehensive options pricing library** built with modern vanilla JavaScript. It implements **5 pricing models**: Cox-Ross-Rubinstein Binomial, Trinomial Tree, Black-Scholes, Jump Diffusion (Merton), and Monte Carlo simulation for valuing American and European options. The library has been **validated against 671,360 real market options** and follows professional JavaScript project standards.
+This is an **interactive educational platform** for understanding options pricing, Greeks, and algorithms. The project consists of two main components:
 
-**🎯 Current Status**: Complete implementation with all advanced models, comprehensive validation, and production-ready code.
+1. **Core Library** (✅ Complete): A comprehensive options pricing library with **5 validated models**: Cox-Ross-Rubinstein Binomial, Trinomial Tree, Black-Scholes, Jump Diffusion (Merton), and Monte Carlo simulation. Validated against **671,360 real market options**.
+
+2. **Educational Website** (🚧 In Development): An interactive learning platform that will live at `[mywebsite.com]/options`, featuring:
+   - Real-time Greeks visualizations with 3D surface plots
+   - Algorithm animations and step-by-step explanations
+   - Interactive playgrounds for experimentation
+   - Comprehensive tutorials from beginner to advanced
+
+**🎯 Current Focus**: Building the educational website using the existing pricing library as the computational backend.
 
 ## Architecture Overview
 
@@ -48,7 +56,42 @@ binomial-options/
 └── docs/                     # Documentation
 ```
 
-## 🚀 Primary Usage (RECOMMENDED)
+## 🌐 Website Development Guidelines
+
+### Frontend Architecture
+- **Framework**: Use modern JavaScript framework (React/Vue/Svelte)
+- **Visualizations**: D3.js for charts, Three.js for 3D surface plots
+- **Animations**: Framer Motion or GSAP for smooth transitions
+- **Styling**: Tailwind CSS with custom components
+- **State Management**: Keep it lightweight, avoid over-engineering
+
+### Educational Content Structure
+```
+content/
+├── tutorials/           # Step-by-step guides
+│   ├── beginner/       # What are options?
+│   ├── intermediate/   # Greeks and strategies
+│   └── advanced/       # Complex models
+├── algorithms/          # Model explanations
+│   ├── binomial.md     # Visual tree walkthrough
+│   ├── blackscholes.md # Assumptions & math
+│   ├── trinomial.md    # Accuracy comparison
+│   ├── montecarlo.md   # Simulation paths
+│   └── jumpdiffusion.md # Market crashes
+└── concepts/            # Core concepts
+    ├── greeks.md       # Delta, gamma, theta, vega
+    ├── volatility.md   # IV and historical vol
+    └── strategies.md   # Common strategies
+```
+
+### Key Interactive Components to Build
+1. **Greeks Dashboard** - Real-time parameter sensitivity
+2. **Payoff Diagram Builder** - Strategy visualization
+3. **Algorithm Animator** - Step-by-step model execution
+4. **3D Surface Plotter** - Greeks across price/time
+5. **Practice Playground** - Experiment with parameters
+
+## 🚀 Library Usage (Backend)
 
 ### Main Library Interface
 
@@ -207,14 +250,21 @@ import { OPTIMAL_PARAMETERS } from './lib/index.js';
 
 ## 🔧 Development Guidelines
 
-### When adding new features:
+### For Website Development:
 
-1. **Use the main library interface** (`lib/index.js`) for most development
-2. **Follow ES6 module patterns** with proper imports/exports
-3. **Add comprehensive JSDoc comments** for all functions
-4. **Include proper error handling** with descriptive messages
-5. **Test against real market data** in `data/market-data-clean.json`
-6. **Maintain backward compatibility** with existing API
+1. **Create reusable visualization components** that can be embedded anywhere
+2. **Make everything interactive** - sliders, inputs, real-time updates
+3. **Focus on educational value** - explain concepts visually
+4. **Progressive disclosure** - start simple, add complexity gradually
+5. **Mobile-first design** - ensure touch-friendly interfaces
+6. **Performance matters** - optimize animations and calculations
+
+### For Library Maintenance:
+
+1. **Keep the library pure** - no UI dependencies in core code
+2. **Maintain validation accuracy** - test against market data
+3. **Document all algorithms** - both code comments and tutorials
+4. **Preserve backward compatibility** - existing API must work
 
 ### File Organization:
 
@@ -321,14 +371,30 @@ These are maintained for backward compatibility but **new development should use
 7. **Jump diffusion for stress** - Use for market crash/spike scenarios
 8. **Monte Carlo for confidence** - Provides statistical uncertainty bounds
 
+## 🎓 Educational Philosophy
+
+### Design Principles
+1. **Visual Learning First** - Show, don't just tell
+2. **Interactive Exploration** - Let users discover by doing
+3. **Gradual Complexity** - Build understanding step by step
+4. **Real-World Context** - Use actual market scenarios
+5. **Immediate Feedback** - Show results instantly
+
+### Content Guidelines
+- **Clear Language** - Avoid unnecessary jargon
+- **Visual Metaphors** - Use analogies and diagrams
+- **Code Examples** - Show actual implementation
+- **Practice Problems** - Reinforce with exercises
+- **Common Mistakes** - Highlight pitfalls
+
 ## 📞 Support & Development
 
-- **Current status**: See `TODO.md` for development priorities
-- **Issues**: Report bugs and feature requests  
-- **Examples**: See `examples/` for comprehensive usage
-- **Tests**: Run validation before deploying changes
-- **Legacy code**: Available in `examples/legacy/` for reference
+- **Current focus**: Building educational website - see `TODO.md`
+- **Library docs**: Complete API in `README.md`
+- **Examples**: See `examples/` for usage patterns
+- **Content ideas**: Educational modules in planning
+- **Visualizations**: Interactive components in development
 
 ---
 
-**For new development, always start with the main library interface (`lib/index.js`) and follow the modern ES6 module patterns shown in the examples.**
+**Priority**: Focus on creating engaging educational experiences that make complex options mathematics accessible and intuitive. The library is complete - now build the learning platform on top of it.**
