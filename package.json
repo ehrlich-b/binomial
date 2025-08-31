@@ -53,6 +53,9 @@
     "*.d.ts"
   ],
   "scripts": {
+    "dev": "npx http-server . -p 8080 -c-1 --cors",
+    "serve": "npx http-server . -p 8080 -c-1 --cors", 
+    "start": "npx http-server . -p 8080 -c-1 --cors",
     "test": "node tests/run-unit-tests.js",
     "test:legacy": "node tests/test.cjs",
     "test:unit": "node --test --test-reporter=spec tests/unit.test.js",

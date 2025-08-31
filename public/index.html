@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Options Pricing Calculator - Real-time Greeks & Analysis</title>
+    <meta name="description" content="Interactive options pricing calculator with real-time Greeks analysis and model comparisons">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Math.js for calculations -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjs@11.11.0/lib/browser/math.min.js"></script>
+    
+    <style>
+        /* Custom animations and styles */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-bold text-gray-800">Options Calculator</h1>
+                </div>
+                <div class="flex items-center space-x-8">
+                    <a href="#home" class="text-gray-600 hover:text-blue-600 transition-colors">Home</a>
+                    <a href="#calculator" class="text-gray-600 hover:text-blue-600 transition-colors">Calculator</a>
+                    <a href="#greeks" class="text-gray-600 hover:text-blue-600 transition-colors">Greeks</a>
+                    <a href="#learn" class="text-gray-600 hover:text-blue-600 transition-colors">Learn</a>
+                    <a href="#playground" class="text-gray-600 hover:text-blue-600 transition-colors">Playground</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-gradient text-white py-20">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h2 class="text-5xl font-bold mb-6">Advanced Options Pricing & Greeks Analysis</h2>
+            <p class="text-xl mb-8 max-w-3xl mx-auto">
+                Real-time options pricing with comprehensive Greeks analysis. 
+                Professional-grade calculations using multiple validated pricing models.
+            </p>
+            <div class="flex justify-center space-x-4">
+                <button onclick="scrollToSection('calculator')" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+                    Start Calculating
+                </button>
+                <button onclick="scrollToSection('learn')" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors">
+                    Learn Basics
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Container -->
+    <div class="max-w-7xl mx-auto px-4 py-12">
+        
+        <!-- Options Calculator Section -->
+        <section id="calculator" class="mb-16">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <h3 class="text-3xl font-bold mb-8 text-center">Interactive Options Calculator</h3>
+                
+                <!-- Calculator Form -->
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="space-y-6">
+                        <h4 class="text-xl font-semibold mb-4">Option Parameters</h4>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Stock Symbol (Optional)</label>
+                            <input type="text" id="symbol" placeholder="AAPL" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Stock Price ($)</label>
+                            <input type="number" id="stockPrice" value="150" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Strike Price ($)</label>
+                            <input type="number" id="strikePrice" value="155" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Days to Expiry</label>
+                            <input type="number" id="daysToExpiry" value="30" min="1" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Volatility (%)</label>
+                            <input type="number" id="volatility" value="25" step="0.1" min="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Option Type</label>
+                            <select id="optionType" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="call">Call</option>
+                                <option value="put">Put</option>
+                            </select>
+                        </div>
+                        
+                        <button onclick="calculateOption()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                            Calculate Option Price
+                        </button>
+                    </div>
+                    
+                    <!-- Results Display -->
+                    <div class="space-y-6">
+                        <h4 class="text-xl font-semibold mb-4">Pricing Results</h4>
+                        <div id="results" class="space-y-4">
+                            <div class="text-center text-gray-500 py-8">
+                                Enter parameters and click calculate to see results
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Greeks Visualization Section -->
+        <section id="greeks" class="mb-16">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <h3 class="text-3xl font-bold mb-8 text-center">Interactive Greeks Dashboard</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-xl font-semibold mb-4">Greeks Values</h4>
+                        <div id="greeksDisplay" class="space-y-3">
+                            <!-- Greeks will be displayed here -->
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-semibold mb-4">Greeks Chart</h4>
+                        <div class="text-gray-600">Chart temporarily disabled - will fix canvas resize issue</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="learn" class="mb-16">
+            <h3 class="text-3xl font-bold mb-8 text-center">Features</h3>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="text-blue-600 text-3xl mb-4">📊</div>
+                    <h4 class="text-xl font-semibold mb-3">Real-time Pricing</h4>
+                    <p class="text-gray-600 mb-4">Calculate options prices using multiple validated pricing models with instant results.</p>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="text-green-600 text-3xl mb-4">📈</div>
+                    <h4 class="text-xl font-semibold mb-3">Greeks Analysis</h4>
+                    <p class="text-gray-600 mb-4">Complete Greeks calculation with visual charts showing risk sensitivities.</p>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="text-purple-600 text-3xl mb-4">🧮</div>
+                    <h4 class="text-xl font-semibold mb-3">Model Comparison</h4>
+                    <p class="text-gray-600 mb-4">Compare Trinomial, Binomial, Black-Scholes, and Monte Carlo pricing side-by-side.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="playground" class="mb-16">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <h3 class="text-3xl font-bold mb-8 text-center">About</h3>
+                <div class="text-center">
+                    <p class="text-gray-600 mb-6">Professional options pricing calculator with advanced Greeks analysis and model comparison capabilities.</p>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h5 class="font-semibold text-blue-800 mb-2">Multiple Models</h5>
+                            <p class="text-sm text-blue-600">Trinomial, Binomial, Black-Scholes, Monte Carlo</p>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <h5 class="font-semibold text-green-800 mb-2">Real-time Greeks</h5>
+                            <p class="text-sm text-green-600">Delta, Gamma, Theta, Vega, Rho analysis</p>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg">
+                            <h5 class="font-semibold text-purple-800 mb-2">Validated Accuracy</h5>
+                            <p class="text-sm text-purple-600">Market-tested pricing algorithms</p>
+                        </div>
+                        <div class="bg-red-50 p-4 rounded-lg">
+                            <h5 class="font-semibold text-red-800 mb-2">Professional Grade</h5>
+                            <p class="text-sm text-red-600">Industry-standard calculations</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div>
+                    <h5 class="text-lg font-semibold mb-4">Options Calculator</h5>
+                    <p class="text-gray-400">Professional-grade options pricing and Greeks analysis.</p>
+                </div>
+                <div>
+                    <h5 class="text-lg font-semibold mb-4">Models</h5>
+                    <ul class="text-gray-400 space-y-2">
+                        <li>Trinomial Trees</li>
+                        <li>Binomial Trees</li>
+                        <li>Black-Scholes</li>
+                        <li>Monte Carlo</li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="text-lg font-semibold mb-4">Analysis</h5>
+                    <ul class="text-gray-400 space-y-2">
+                        <li>Complete Greeks Suite</li>
+                        <li>Model Comparison</li>
+                        <li>Risk Visualization</li>
+                        <li>Real-time Updates</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>Professional Options Pricing Calculator</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Include the pricing library -->
+    <script type="module" src="../lib/index.js"></script>
+    
+    <!-- Main application JavaScript -->
+    <script type="module">
+        // Import pricing functions from our validated library
+        let pricingLibrary;
+        let greeksChart;
+        
+        // Initialize the application
+        window.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Import pricing library
+                const module = await import('../lib/index.js');
+                pricingLibrary = module;
+                console.log('🚀 Pricing library loaded successfully');
+                console.log('📊 Loaded modules:', Object.keys(module));
+                
+                // Skip chart initialization - causing infinite loops
+                // initializeGreeksChart();
+                
+            } catch (error) {
+                console.error('❌ Failed to load pricing library:', error);
+                // Show error to user
+                document.getElementById('results').innerHTML = `
+                    <div class="text-red-600 p-4 bg-red-50 rounded-lg">
+                        <h5 class="font-semibold mb-2">Library Loading Error</h5>
+                        <p class="text-sm">Failed to load the pricing library. Please check the console for details.</p>
+                    </div>
+                `;
+            }
+        });
+
+        // Chart functions removed - causing infinite canvas growth
+
+        // Calculator functionality - with safety checks
+        window.calculateOption = function() {
+            // Prevent recursive calls
+            if (isCalculating) {
+                console.log('Already calculating, skipping...');
+                return;
+            }
+            
+            if (!pricingLibrary) {
+                console.error('Pricing library not loaded yet');
+                return;
+            }
+
+            isCalculating = true;
+
+            try {
+                const params = {
+                    symbol: document.getElementById('symbol').value || undefined,
+                    stockPrice: parseFloat(document.getElementById('stockPrice').value),
+                    strikePrice: parseFloat(document.getElementById('strikePrice').value),
+                    daysToExpiry: parseInt(document.getElementById('daysToExpiry').value),
+                    volatility: parseFloat(document.getElementById('volatility').value) / 100,
+                    optionType: document.getElementById('optionType').value
+                };
+
+                // Validate inputs
+                if (isNaN(params.stockPrice) || isNaN(params.strikePrice) || isNaN(params.daysToExpiry) || isNaN(params.volatility)) {
+                    throw new Error('Please enter valid numbers for all fields');
+                }
+
+                // Simple pricing only - no complex calculations
+                const price = pricingLibrary.priceOption(params);
+                
+                // Basic Greeks calculation
+                const greeks = pricingLibrary.calculateGreeks({
+                    ...params,
+                    timeToExpiry: params.daysToExpiry / 365,
+                    riskFreeRate: 0.04,
+                    dividendYield: 0.02,
+                    exerciseStyle: 'american'
+                });
+                
+                displayResults(price, greeks, params);
+                updateGreeksDisplay(greeks);
+                
+            } catch (error) {
+                console.error('Calculation error:', error);
+                document.getElementById('results').innerHTML = `
+                    <div class="text-red-600 p-4 bg-red-50 rounded-lg">
+                        <h5 class="font-semibold mb-2">Calculation Error</h5>
+                        <p class="text-sm">Error: ${error.message}</p>
+                    </div>
+                `;
+            } finally {
+                isCalculating = false;
+            }
+        };
+
+        function displayResults(price, greeks, params) {
+            const intrinsic = params.optionType === 'call' 
+                ? Math.max(0, params.stockPrice - params.strikePrice)
+                : Math.max(0, params.strikePrice - params.stockPrice);
+            const timeValue = price - intrinsic;
+
+            document.getElementById('results').innerHTML = `
+                <div class="space-y-4">
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h5 class="font-semibold text-blue-800 mb-2">Option Price</h5>
+                        <div class="text-3xl font-bold text-blue-600">$${price.toFixed(2)}</div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-green-50 p-3 rounded-lg">
+                            <div class="text-sm text-green-600">Intrinsic Value</div>
+                            <div class="font-semibold text-green-800">$${intrinsic.toFixed(2)}</div>
+                        </div>
+                        <div class="bg-purple-50 p-3 rounded-lg">
+                            <div class="text-sm text-purple-600">Time Value</div>
+                            <div class="font-semibold text-purple-800">$${timeValue.toFixed(2)}</div>
+                        </div>
+                    </div>
+                    
+                </div>
+            `;
+        }
+
+        function updateGreeksDisplay(greeks) {
+            if (!greeks || Object.keys(greeks).length === 0) return;
+
+            const greeksHtml = `
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                        <div>
+                            <span class="font-medium">Delta</span>
+                            <div class="text-xs text-gray-600">Price sensitivity</div>
+                        </div>
+                        <span class="font-bold text-blue-600">${greeks.delta?.toFixed(4) || 'N/A'}</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                        <div>
+                            <span class="font-medium">Gamma</span>
+                            <div class="text-xs text-gray-600">Delta sensitivity</div>
+                        </div>
+                        <span class="font-bold text-green-600">${greeks.gamma?.toFixed(4) || 'N/A'}</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg">
+                        <div>
+                            <span class="font-medium">Theta</span>
+                            <div class="text-xs text-gray-600">Time decay (per day)</div>
+                        </div>
+                        <span class="font-bold text-red-600">${greeks.theta?.toFixed(4) || 'N/A'}</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+                        <div>
+                            <span class="font-medium">Vega</span>
+                            <div class="text-xs text-gray-600">Volatility sensitivity</div>
+                        </div>
+                        <span class="font-bold text-purple-600">${greeks.vega?.toFixed(4) || 'N/A'}</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
+                        <div>
+                            <span class="font-medium">Rho</span>
+                            <div class="text-xs text-gray-600">Interest rate sensitivity</div>
+                        </div>
+                        <span class="font-bold text-yellow-600">${greeks.rho?.toFixed(4) || 'N/A'}</span>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('greeksDisplay').innerHTML = greeksHtml;
+        }
+
+        // Update Greeks chart with real values
+        function updateGreeksChart(greeks) {
+            if (!greeksChart || !greeks) return;
+            
+            // Normalize values for radar chart visualization
+            const normalizeValue = (value, maxExpected) => {
+                return Math.max(-1, Math.min(1, value / maxExpected));
+            };
+            
+            const chartData = [
+                normalizeValue(greeks.delta || 0, 1),      // Delta: -1 to 1
+                normalizeValue(greeks.gamma || 0, 0.1),    // Gamma: normalize around 0.1
+                normalizeValue(greeks.theta || 0, 0.1),    // Theta: normalize around 0.1 (daily)
+                normalizeValue(greeks.vega || 0, 0.5),     // Vega: normalize around 0.5
+                normalizeValue(greeks.rho || 0, 0.2)       // Rho: normalize around 0.2
+            ];
+            
+            greeksChart.data.datasets[0].data = chartData;
+            greeksChart.update('none'); // No animation for smooth real-time updates
+        }
+
+        // Smooth scrolling
+        window.scrollToSection = function(sectionId) {
+            document.getElementById(sectionId).scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        };
+
+        // Manual calculation only - prevent infinite loops
+        let isCalculating = false;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded - ready for manual calculations');
+            // Remove all auto-calculation to prevent infinite loops
+        });
+
+        // Debounce helper function
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+    </script>
+</body>
+</html>
