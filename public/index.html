@@ -343,6 +343,9 @@
                     <button onclick="showAlgorithm('montecarlo')" class="px-6 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors" id="montecarloBtn">
                         🎲 Monte Carlo
                     </button>
+                    <button onclick="showAlgorithm('jumpdiffusion')" class="px-6 py-3 bg-yellow-600 text-white rounded-lg font-semibold hover:bg-yellow-700 transition-colors" id="jumpdiffusionBtn">
+                        ⚡ Jump Diffusion
+                    </button>
                 </div>
                 
                 <!-- Binomial Tree Animation -->
@@ -720,6 +723,374 @@
                                     </ul>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Jump Diffusion Animation -->
+                <div id="jumpdiffusionAnimation" class="algorithm-content hidden">
+                    <div class="bg-white rounded-lg p-6 shadow-sm">
+                        <h4 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                            <span class="text-3xl mr-3">⚡</span>
+                            Jump Diffusion Model (Merton)
+                        </h4>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Jump Controls -->
+                            <div class="space-y-4">
+                                <div class="bg-yellow-50 p-4 rounded-lg">
+                                    <h5 class="font-semibold text-yellow-800 mb-3">Jump Parameters</h5>
+                                    <div class="space-y-3">
+                                        <div class="flex items-center justify-between text-sm">
+                                            <span>Jump Intensity (λ):</span>
+                                            <input type="range" id="jumpIntensity" min="0.1" max="5" step="0.1" value="2" class="ml-4">
+                                            <span id="jumpIntensityValue" class="font-bold ml-2">2.0</span>
+                                        </div>
+                                        <div class="flex items-center justify-between text-sm">
+                                            <span>Jump Size (μ_J):</span>
+                                            <input type="range" id="jumpMean" min="-0.1" max="0.1" step="0.01" value="-0.02" class="ml-4">
+                                            <span id="jumpMeanValue" class="font-bold ml-2">-2%</span>
+                                        </div>
+                                        <div class="flex items-center justify-between text-sm">
+                                            <span>Jump Vol (σ_J):</span>
+                                            <input type="range" id="jumpVol" min="0.05" max="0.2" step="0.01" value="0.08" class="ml-4">
+                                            <span id="jumpVolValue" class="font-bold ml-2">8%</span>
+                                        </div>
+                                        <div class="flex items-center justify-between text-sm">
+                                            <span>Time Steps:</span>
+                                            <input type="range" id="jumpSteps" min="100" max="1000" step="50" value="250" class="ml-4">
+                                            <span id="jumpStepsValue" class="font-bold ml-2">250</span>
+                                        </div>
+                                        <button onclick="animateJumpDiffusion()" class="w-full bg-yellow-600 text-white py-2 rounded-lg font-semibold hover:bg-yellow-700 transition-colors">
+                                            ⚡ Start Jump Simulation
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Educational Content -->
+                                <div class="bg-red-50 p-4 rounded-lg">
+                                    <h5 class="font-semibold text-red-800 mb-3">🎯 Why Jump Diffusion?</h5>
+                                    <div class="text-sm text-red-700 space-y-2">
+                                        <p><strong>Market Reality:</strong> Stock prices can jump suddenly due to news, earnings, or market crashes.</p>
+                                        <p><strong>Black-Scholes Limitation:</strong> Assumes continuous, smooth price changes only.</p>
+                                        <p><strong>Jump Enhancement:</strong> Adds sudden price jumps to normal diffusion process.</p>
+                                        <div class="font-mono bg-white p-2 rounded mt-3">
+                                            dS = μSdt + σSdW + SdJ
+                                        </div>
+                                        <p><strong>dJ:</strong> Jump component with Poisson arrival</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Visualization -->
+                            <div class="space-y-4">
+                                <div class="bg-gray-50 rounded-lg p-4 h-80" id="jumpCanvas">
+                                    <div class="flex items-center justify-center h-full text-gray-500">
+                                        <div class="text-center">
+                                            <div class="text-4xl mb-2">⚡</div>
+                                            <p>Jump diffusion simulation will appear here</p>
+                                            <p class="text-sm mt-2">Click "Start Jump Simulation" to see price paths with sudden jumps</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Jump Statistics -->
+                                <div class="bg-blue-50 p-4 rounded-lg">
+                                    <h5 class="font-semibold text-blue-800 mb-3">Jump Statistics</h5>
+                                    <div class="grid grid-cols-2 gap-4 text-sm">
+                                        <div>
+                                            <span class="block text-gray-600">Expected Jumps/Year:</span>
+                                            <span id="expectedJumps" class="font-bold text-blue-800">2.0</span>
+                                        </div>
+                                        <div>
+                                            <span class="block text-gray-600">Observed Jumps:</span>
+                                            <span id="observedJumps" class="font-bold text-blue-800">0</span>
+                                        </div>
+                                        <div>
+                                            <span class="block text-gray-600">Avg Jump Size:</span>
+                                            <span id="avgJumpSize" class="font-bold text-blue-800">0%</span>
+                                        </div>
+                                        <div>
+                                            <span class="block text-gray-600">Price Range:</span>
+                                            <span id="priceRange" class="font-bold text-blue-800">$0 - $0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Model Comparison -->
+                                <div class="bg-green-50 p-4 rounded-lg">
+                                    <h5 class="font-semibold text-green-800 mb-3">📊 Model Comparison</h5>
+                                    <div class="text-sm text-green-700 space-y-1">
+                                        <div class="flex justify-between">
+                                            <span>Black-Scholes Price:</span>
+                                            <span id="bsJumpPrice" class="font-bold">$0.00</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>Jump-Diffusion Price:</span>
+                                            <span id="jdJumpPrice" class="font-bold">$0.00</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>Jump Premium:</span>
+                                            <span id="jumpPremium" class="font-bold">$0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Tutorials Section -->
+        <section class="mb-16">
+            <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-8">
+                <h3 class="text-3xl font-bold text-gray-800 mb-6 text-center">📚 Interactive Tutorials</h3>
+                <p class="text-gray-600 text-center mb-8">Step-by-step guided learning experiences to master options concepts</p>
+                
+                <!-- Tutorial Selection -->
+                <div class="flex flex-wrap justify-center gap-4 mb-8">
+                    <button onclick="showTutorial('greeks')" class="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors" id="greeksTutorialBtn">
+                        📊 Understanding Greeks
+                    </button>
+                    <button onclick="showTutorial('options-basics')" class="px-6 py-3 bg-pink-600 text-white rounded-lg font-semibold hover:bg-pink-700 transition-colors" id="optionsBasicsTutorialBtn">
+                        🎯 Options Basics
+                    </button>
+                    <button onclick="showTutorial('pricing-models')" class="px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors" id="pricingModelsTutorialBtn">
+                        ⚙️ Pricing Models
+                    </button>
+                    <button onclick="showTutorial('risk-management')" class="px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-colors" id="riskManagementTutorialBtn">
+                        🛡️ Risk Management
+                    </button>
+                </div>
+                
+                <!-- Understanding Greeks Tutorial -->
+                <div id="greeksTutorial" class="tutorial-content">
+                    <div class="bg-white rounded-lg p-6 shadow-sm">
+                        <h4 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                            <span class="text-3xl mr-3">📊</span>
+                            Understanding the Greeks - Interactive Tutorial
+                        </h4>
+                        
+                        <!-- Progress Bar -->
+                        <div class="mb-6">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm text-gray-600">Tutorial Progress</span>
+                                <span class="text-sm text-gray-600" id="tutorialProgress">Step 1 of 5</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-purple-600 h-2 rounded-full transition-all duration-500" id="progressBar" style="width: 20%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Tutorial Content -->
+                            <div class="space-y-4">
+                                <div class="bg-purple-50 p-4 rounded-lg">
+                                    <div id="tutorialStep" class="space-y-4">
+                                        <!-- Step content will be dynamically updated -->
+                                        <div class="text-lg font-semibold text-purple-800">Step 1: What are the Greeks?</div>
+                                        <p class="text-purple-700">The "Greeks" are risk sensitivities that measure how an option's price changes with respect to various factors. They're called Greeks because most are represented by Greek letters (Δ, Γ, Θ, ν, ρ).</p>
+                                        <div class="bg-white p-3 rounded border">
+                                            <strong>Think of Greeks as:</strong>
+                                            <ul class="mt-2 text-sm space-y-1">
+                                                <li>• <strong>Delta (Δ):</strong> Speed - how fast price moves with stock</li>
+                                                <li>• <strong>Gamma (Γ):</strong> Acceleration - how speed changes</li>
+                                                <li>• <strong>Theta (Θ):</strong> Time decay - daily price erosion</li>
+                                                <li>• <strong>Vega (ν):</strong> Volatility sensitivity</li>
+                                                <li>• <strong>Rho (ρ):</strong> Interest rate sensitivity</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex justify-between mt-6">
+                                        <button onclick="previousTutorialStep()" id="prevBtn" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-400 transition-colors" disabled>
+                                            ← Previous
+                                        </button>
+                                        <button onclick="nextTutorialStep()" id="nextBtn" class="px-4 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors">
+                                            Next →
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Interactive Demo -->
+                            <div class="space-y-4">
+                                <div class="bg-gray-50 rounded-lg p-4">
+                                    <h5 class="font-semibold text-gray-800 mb-3">Live Greeks Demo</h5>
+                                    <div id="tutorialDemo">
+                                        <!-- Interactive elements for current step -->
+                                        <div class="space-y-3">
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-1">Stock Price: <span id="tutorialStockPrice">$100</span></label>
+                                                <input type="range" id="tutorialStockSlider" min="80" max="120" value="100" class="w-full">
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-1">Days to Expiry: <span id="tutorialDaysValue">30</span></label>
+                                                <input type="range" id="tutorialDaysSlider" min="1" max="90" value="30" class="w-full">
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-1">Volatility: <span id="tutorialVolValue">25%</span></label>
+                                                <input type="range" id="tutorialVolSlider" min="10" max="50" value="25" class="w-full">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Greeks Display for Tutorial -->
+                                <div class="bg-blue-50 p-4 rounded-lg">
+                                    <h5 class="font-semibold text-blue-800 mb-3">Current Greeks</h5>
+                                    <div class="space-y-2 text-sm" id="tutorialGreeksDisplay">
+                                        <div class="flex justify-between">
+                                            <span>Delta (Δ):</span>
+                                            <span class="font-bold" id="tutorialDelta">0.60</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>Gamma (Γ):</span>
+                                            <span class="font-bold" id="tutorialGamma">0.03</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>Theta (Θ):</span>
+                                            <span class="font-bold" id="tutorialTheta">-0.15</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>Vega (ν):</span>
+                                            <span class="font-bold" id="tutorialVega">0.20</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Step-specific insights -->
+                                <div class="bg-green-50 p-4 rounded-lg">
+                                    <h5 class="font-semibold text-green-800 mb-3">💡 Key Insight</h5>
+                                    <p class="text-sm text-green-700" id="tutorialInsight">
+                                        Move the stock price slider and watch how Delta changes the option value. Delta tells you how much the option price moves for each $1 stock price change!
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Options Basics Tutorial -->
+                <div id="optionsBasicsTutorial" class="tutorial-content hidden">
+                    <div class="bg-white rounded-lg p-6 shadow-sm">
+                        <h4 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                            <span class="text-3xl mr-3">🎯</span>
+                            Options Basics - Interactive Tutorial
+                        </h4>
+                        
+                        <!-- Progress Bar for Options Basics -->
+                        <div class="mb-6">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm text-gray-600">Tutorial Progress</span>
+                                <span class="text-sm text-gray-600" id="optionsBasicsProgress">Step 1 of 6</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-pink-600 h-2 rounded-full transition-all duration-500" id="optionsBasicsProgressBar" style="width: 16.6%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Tutorial Content -->
+                            <div class="space-y-4">
+                                <div class="bg-pink-50 p-4 rounded-lg">
+                                    <div id="optionsBasicsStep" class="space-y-4">
+                                        <!-- Step content will be dynamically updated -->
+                                        <div class="text-lg font-semibold text-pink-800">Step 1: What is an Option?</div>
+                                        <p class="text-pink-700">An option is a contract that gives you the RIGHT (not obligation) to buy or sell a stock at a specific price by a certain date. Think of it like a reservation at a restaurant - you have the right to use it, but you don't have to.</p>
+                                        <div class="bg-white p-3 rounded border">
+                                            <strong>Key Components:</strong>
+                                            <ul class="mt-2 text-sm space-y-1">
+                                                <li>• <strong>Strike Price:</strong> The price at which you can buy/sell</li>
+                                                <li>• <strong>Expiration Date:</strong> When the option expires</li>
+                                                <li>• <strong>Premium:</strong> The cost to buy the option</li>
+                                                <li>• <strong>Underlying Asset:</strong> The stock the option is based on</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex justify-between mt-6">
+                                        <button onclick="previousOptionsBasicsStep()" id="optionsBasicsPrevBtn" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-400 transition-colors" disabled>
+                                            ← Previous
+                                        </button>
+                                        <button onclick="nextOptionsBasicsStep()" id="optionsBasicsNextBtn" class="px-4 py-2 bg-pink-600 text-white rounded-lg font-medium hover:bg-pink-700 transition-colors">
+                                            Next →
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Interactive Demo -->
+                            <div class="space-y-4">
+                                <div class="bg-gray-50 rounded-lg p-4">
+                                    <h5 class="font-semibold text-gray-800 mb-3">Interactive Example</h5>
+                                    <div id="optionsBasicsDemo">
+                                        <!-- Interactive elements for current step -->
+                                        <div class="space-y-3">
+                                            <div class="bg-blue-100 p-3 rounded">
+                                                <div class="text-sm font-medium text-blue-800">Example: AAPL Call Option</div>
+                                                <div class="text-xs text-blue-600 mt-1">
+                                                    <div>Current AAPL Price: $150</div>
+                                                    <div>Strike Price: $155</div>
+                                                    <div>Expires: 30 days</div>
+                                                    <div>Premium: $3.50</div>
+                                                </div>
+                                            </div>
+                                            <div class="text-sm">
+                                                <strong>What this means:</strong> You pay $350 ($3.50 × 100 shares) for the right to buy 100 AAPL shares at $155 each, anytime in the next 30 days.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Dynamic Visualization Area -->
+                                <div class="bg-green-50 p-4 rounded-lg">
+                                    <h5 class="font-semibold text-green-800 mb-3">📊 Visualization</h5>
+                                    <div id="optionsBasicsVisualization">
+                                        <div class="h-32 bg-white rounded border flex items-center justify-center">
+                                            <div class="text-center text-gray-500">
+                                                <div class="text-2xl mb-1">📈</div>
+                                                <div class="text-sm">Option concept diagram</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Step-specific insights -->
+                                <div class="bg-yellow-50 p-4 rounded-lg">
+                                    <h5 class="font-semibold text-yellow-800 mb-3">💡 Key Point</h5>
+                                    <p class="text-sm text-yellow-700" id="optionsBasicsInsight">
+                                        Options give you leverage and limited risk. You can control 100 shares for much less money than buying the stock outright!
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="pricingModelsTutorial" class="tutorial-content hidden">
+                    <div class="bg-white rounded-lg p-6 shadow-sm">
+                        <h4 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                            <span class="text-3xl mr-3">⚙️</span>
+                            Pricing Models Tutorial
+                        </h4>
+                        <div class="text-center text-gray-500 py-8">
+                            <div class="text-4xl mb-4">🚧</div>
+                            <p>Coming Soon - Deep dive into pricing model mechanics</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="riskManagementTutorial" class="tutorial-content hidden">
+                    <div class="bg-white rounded-lg p-6 shadow-sm">
+                        <h4 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                            <span class="text-3xl mr-3">🛡️</span>
+                            Risk Management Tutorial
+                        </h4>
+                        <div class="text-center text-gray-500 py-8">
+                            <div class="text-4xl mb-4">🚧</div>
+                            <p>Coming Soon - Portfolio risk management strategies</p>
                         </div>
                     </div>
                 </div>
@@ -1757,6 +2128,23 @@
             document.getElementById('mcShowPaths').addEventListener('input', function() {
                 document.getElementById('mcShowPathsValue').textContent = this.value;
             });
+            
+            // Jump Diffusion sliders
+            document.getElementById('jumpIntensity').addEventListener('input', function() {
+                document.getElementById('jumpIntensityValue').textContent = parseFloat(this.value).toFixed(1);
+            });
+            
+            document.getElementById('jumpMean').addEventListener('input', function() {
+                document.getElementById('jumpMeanValue').textContent = (parseFloat(this.value) * 100).toFixed(0) + '%';
+            });
+            
+            document.getElementById('jumpVol').addEventListener('input', function() {
+                document.getElementById('jumpVolValue').textContent = (parseFloat(this.value) * 100).toFixed(0) + '%';
+            });
+            
+            document.getElementById('jumpSteps').addEventListener('input', function() {
+                document.getElementById('jumpStepsValue').textContent = this.value;
+            });
         }
         
         // Algorithm switching functionality
@@ -1769,7 +2157,7 @@
             });
             
             // Reset button styles
-            const buttons = ['binomialBtn', 'trinomialBtn', 'blackscholesBtn', 'montecarloBtn'];
+            const buttons = ['binomialBtn', 'trinomialBtn', 'blackscholesBtn', 'montecarloBtn', 'jumpdiffusionBtn'];
             buttons.forEach(btn => {
                 const element = document.getElementById(btn);
                 element.className = element.className.replace(/bg-\w+-700/, 'bg-gray-400');
@@ -1794,7 +2182,8 @@
                 'binomial': 'bg-blue-700',
                 'trinomial': 'bg-green-700',
                 'blackscholes': 'bg-purple-700',
-                'montecarlo': 'bg-red-700'
+                'montecarlo': 'bg-red-700',
+                'jumpdiffusion': 'bg-yellow-700'
             };
             return colors[algorithm] || 'bg-blue-700';
         }
@@ -2312,6 +2701,1052 @@
             }
             
             nextStep();
+        }
+
+        // ============================================================================
+        // JUMP DIFFUSION ANIMATION IMPLEMENTATION
+        // ============================================================================
+
+        let jumpPaths = [];
+        let jumpStats = { jumps: 0, totalJumpSize: 0 };
+
+        function animateJumpDiffusion() {
+            const intensity = parseFloat(document.getElementById('jumpIntensity').value);
+            const jumpMean = parseFloat(document.getElementById('jumpMean').value);
+            const jumpVol = parseFloat(document.getElementById('jumpVol').value);
+            const steps = parseInt(document.getElementById('jumpSteps').value);
+            
+            // Reset statistics
+            jumpStats = { jumps: 0, totalJumpSize: 0 };
+            jumpPaths = [];
+            
+            // Get current option parameters
+            const stockPrice = parseFloat(document.getElementById('stockPrice').value) || 100;
+            const strikePrice = parseFloat(document.getElementById('strikePrice').value) || 105;
+            const timeToExpiry = parseFloat(document.getElementById('timeToExpiry').value) || 30;
+            const riskFreeRate = parseFloat(document.getElementById('riskFreeRate').value) || 4;
+            const volatility = parseFloat(document.getElementById('volatility').value) || 25;
+            
+            // Convert to decimal
+            const r = riskFreeRate / 100;
+            const sigma = volatility / 100;
+            const T = timeToExpiry / 365;
+            
+            // Generate 5 sample paths for visualization
+            const numPaths = 5;
+            const dt = T / steps;
+            
+            for (let path = 0; path < numPaths; path++) {
+                const prices = [stockPrice];
+                let currentPrice = stockPrice;
+                let pathJumps = 0;
+                let pathJumpSize = 0;
+                
+                for (let i = 1; i <= steps; i++) {
+                    // Standard Brownian motion component
+                    const dW = Math.sqrt(dt) * normalRandom();
+                    
+                    // Check for jump (Poisson process)
+                    const jumpProbability = intensity * dt;
+                    const hasJump = Math.random() < jumpProbability;
+                    
+                    let jumpComponent = 0;
+                    if (hasJump) {
+                        // Generate jump size (log-normal)
+                        const jumpSize = jumpMean + jumpVol * normalRandom();
+                        jumpComponent = Math.exp(jumpSize) - 1;
+                        pathJumps++;
+                        pathJumpSize += jumpComponent;
+                        jumpStats.jumps++;
+                        jumpStats.totalJumpSize += jumpComponent;
+                    }
+                    
+                    // Jump-diffusion price evolution
+                    const drift = (r - intensity * (Math.exp(jumpMean + 0.5 * jumpVol * jumpVol) - 1)) * dt;
+                    const diffusion = sigma * dW;
+                    const jump = jumpComponent;
+                    
+                    currentPrice = currentPrice * Math.exp(drift + diffusion + Math.log(1 + jump));
+                    prices.push(currentPrice);
+                }
+                
+                jumpPaths.push({
+                    prices: prices,
+                    jumps: pathJumps,
+                    avgJumpSize: pathJumps > 0 ? pathJumpSize / pathJumps : 0
+                });
+            }
+            
+            // Update statistics display
+            updateJumpStatistics(intensity, T);
+            
+            // Calculate and display model prices
+            updateJumpPricing(stockPrice, strikePrice, T, r, sigma, intensity, jumpMean, jumpVol);
+            
+            // Render the visualization
+            renderJumpVisualization(steps, T);
+        }
+        
+        function updateJumpStatistics(intensity, T) {
+            document.getElementById('expectedJumps').textContent = (intensity * T).toFixed(1);
+            document.getElementById('observedJumps').textContent = jumpStats.jumps;
+            
+            const avgJump = jumpStats.jumps > 0 ? (jumpStats.totalJumpSize / jumpStats.jumps * 100).toFixed(1) : '0';
+            document.getElementById('avgJumpSize').textContent = avgJump + '%';
+            
+            // Calculate price range
+            let minPrice = Infinity, maxPrice = -Infinity;
+            jumpPaths.forEach(path => {
+                path.prices.forEach(price => {
+                    minPrice = Math.min(minPrice, price);
+                    maxPrice = Math.max(maxPrice, price);
+                });
+            });
+            
+            if (jumpPaths.length > 0) {
+                document.getElementById('priceRange').textContent = 
+                    '$' + minPrice.toFixed(0) + ' - $' + maxPrice.toFixed(0);
+            }
+        }
+        
+        function updateJumpPricing(S, K, T, r, sigma, lambda, mu, sigmaJ) {
+            // Calculate Black-Scholes price (for comparison)
+            const bsPrice = calculateBlackScholesPrice(S, K, T, r, sigma);
+            
+            // Approximate Jump-Diffusion price using Merton's formula
+            // This is a simplified implementation for educational purposes
+            const jumpDiffusionPrice = calculateJumpDiffusionPrice(S, K, T, r, sigma, lambda, mu, sigmaJ);
+            
+            document.getElementById('bsJumpPrice').textContent = '$' + bsPrice.toFixed(2);
+            document.getElementById('jdJumpPrice').textContent = '$' + jumpDiffusionPrice.toFixed(2);
+            document.getElementById('jumpPremium').textContent = '$' + (jumpDiffusionPrice - bsPrice).toFixed(2);
+        }
+        
+        function calculateJumpDiffusionPrice(S, K, T, r, sigma, lambda, mu, sigmaJ) {
+            // Merton's jump-diffusion formula (simplified)
+            // In practice, this involves summing over multiple terms
+            const k = Math.exp(mu + 0.5 * sigmaJ * sigmaJ) - 1;
+            const adjustedRate = r - lambda * k;
+            
+            // Use Black-Scholes with adjusted parameters as approximation
+            return calculateBlackScholesPrice(S, K, T, adjustedRate, sigma) * (1 + lambda * T * k);
+        }
+        
+        function renderJumpVisualization(steps, T) {
+            const canvas = document.getElementById('jumpCanvas');
+            const ctx = document.createElement('canvas');
+            ctx.width = canvas.clientWidth - 20;
+            ctx.height = canvas.clientHeight - 20;
+            ctx.style.width = '100%';
+            ctx.style.height = '100%';
+            
+            // Clear canvas and add the new one
+            canvas.innerHTML = '';
+            canvas.appendChild(ctx);
+            
+            const context = ctx.getContext('2d');
+            const width = ctx.width;
+            const height = ctx.height;
+            
+            // Set up axes
+            const padding = 40;
+            const chartWidth = width - 2 * padding;
+            const chartHeight = height - 2 * padding;
+            
+            // Find price bounds
+            let minPrice = Infinity, maxPrice = -Infinity;
+            jumpPaths.forEach(path => {
+                path.prices.forEach(price => {
+                    minPrice = Math.min(minPrice, price);
+                    maxPrice = Math.max(maxPrice, price);
+                });
+            });
+            
+            const priceRange = maxPrice - minPrice;
+            minPrice -= priceRange * 0.1;
+            maxPrice += priceRange * 0.1;
+            
+            // Clear background
+            context.fillStyle = '#f9fafb';
+            context.fillRect(0, 0, width, height);
+            
+            // Draw grid
+            context.strokeStyle = '#e5e7eb';
+            context.lineWidth = 1;
+            
+            // Vertical grid lines (time)
+            for (let i = 0; i <= 10; i++) {
+                const x = padding + (i / 10) * chartWidth;
+                context.beginPath();
+                context.moveTo(x, padding);
+                context.lineTo(x, height - padding);
+                context.stroke();
+            }
+            
+            // Horizontal grid lines (price)
+            for (let i = 0; i <= 10; i++) {
+                const y = padding + (i / 10) * chartHeight;
+                context.beginPath();
+                context.moveTo(padding, y);
+                context.lineTo(width - padding, y);
+                context.stroke();
+            }
+            
+            // Draw axes
+            context.strokeStyle = '#374151';
+            context.lineWidth = 2;
+            context.beginPath();
+            context.moveTo(padding, height - padding);
+            context.lineTo(width - padding, height - padding);
+            context.moveTo(padding, padding);
+            context.lineTo(padding, height - padding);
+            context.stroke();
+            
+            // Draw price paths
+            const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
+            
+            jumpPaths.forEach((path, pathIndex) => {
+                context.strokeStyle = colors[pathIndex % colors.length];
+                context.lineWidth = 2;
+                context.beginPath();
+                
+                path.prices.forEach((price, i) => {
+                    const x = padding + (i / (steps)) * chartWidth;
+                    const y = height - padding - ((price - minPrice) / (maxPrice - minPrice)) * chartHeight;
+                    
+                    if (i === 0) {
+                        context.moveTo(x, y);
+                    } else {
+                        context.lineTo(x, y);
+                    }
+                });
+                
+                context.stroke();
+            });
+            
+            // Add labels
+            context.fillStyle = '#374151';
+            context.font = '12px Arial';
+            context.textAlign = 'center';
+            context.fillText('Time', width / 2, height - 10);
+            
+            context.save();
+            context.translate(15, height / 2);
+            context.rotate(-Math.PI / 2);
+            context.fillText('Stock Price ($)', 0, 0);
+            context.restore();
+            
+            // Price axis labels
+            context.textAlign = 'right';
+            for (let i = 0; i <= 5; i++) {
+                const price = minPrice + (i / 5) * (maxPrice - minPrice);
+                const y = height - padding - (i / 5) * chartHeight;
+                context.fillText('$' + price.toFixed(0), padding - 5, y + 3);
+            }
+        }
+        
+        function normalRandom() {
+            // Box-Muller transformation for normal random variables
+            if (!normalRandom.hasSpare) {
+                normalRandom.hasSpare = true;
+                const u1 = Math.random();
+                const u2 = Math.random();
+                normalRandom.spare = Math.sqrt(-2 * Math.log(u1)) * Math.sin(2 * Math.PI * u2);
+                return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+            } else {
+                normalRandom.hasSpare = false;
+                return normalRandom.spare;
+            }
+        }
+
+        // ============================================================================
+        // INTERACTIVE TUTORIALS IMPLEMENTATION
+        // ============================================================================
+
+        let currentTutorialStep = 0;
+        let currentTutorial = 'greeks';
+        
+        // Tutorial content data
+        const tutorialContent = {
+            greeks: {
+                totalSteps: 5,
+                steps: [
+                    {
+                        title: "Step 1: What are the Greeks?",
+                        content: `
+                            <p class="text-purple-700">The "Greeks" are risk sensitivities that measure how an option's price changes with respect to various factors. They're called Greeks because most are represented by Greek letters (Δ, Γ, Θ, ν, ρ).</p>
+                            <div class="bg-white p-3 rounded border">
+                                <strong>Think of Greeks as:</strong>
+                                <ul class="mt-2 text-sm space-y-1">
+                                    <li>• <strong>Delta (Δ):</strong> Speed - how fast price moves with stock</li>
+                                    <li>• <strong>Gamma (Γ):</strong> Acceleration - how speed changes</li>
+                                    <li>• <strong>Theta (Θ):</strong> Time decay - daily price erosion</li>
+                                    <li>• <strong>Vega (ν):</strong> Volatility sensitivity</li>
+                                    <li>• <strong>Rho (ρ):</strong> Interest rate sensitivity</li>
+                                </ul>
+                            </div>
+                        `,
+                        insight: "Move the stock price slider and watch how Delta changes the option value. Delta tells you how much the option price moves for each $1 stock price change!",
+                        focusGreek: "delta"
+                    },
+                    {
+                        title: "Step 2: Delta - The Price Speedometer",
+                        content: `
+                            <p class="text-purple-700">Delta measures how much an option's price changes when the underlying stock price moves by $1. It ranges from 0 to 1 for calls, and 0 to -1 for puts.</p>
+                            <div class="bg-white p-3 rounded border">
+                                <strong>Delta Examples:</strong>
+                                <ul class="mt-2 text-sm space-y-1">
+                                    <li>• <strong>Call with Δ = 0.60:</strong> Price rises $0.60 per $1 stock increase</li>
+                                    <li>• <strong>Put with Δ = -0.40:</strong> Price falls $0.40 per $1 stock increase</li>
+                                    <li>• <strong>At-the-money:</strong> Delta ≈ 0.50 (50% probability of expiring ITM)</li>
+                                    <li>• <strong>Deep ITM:</strong> Delta approaches 1.0 (almost certain to expire ITM)</li>
+                                </ul>
+                            </div>
+                        `,
+                        insight: "Watch how Delta changes as you move the stock price! Notice it's highest when the option is at-the-money (stock price = strike price).",
+                        focusGreek: "delta"
+                    },
+                    {
+                        title: "Step 3: Gamma - The Acceleration Factor",
+                        content: `
+                            <p class="text-purple-700">Gamma measures how much Delta changes when the stock price moves by $1. Think of it as the "acceleration" of your option's price sensitivity.</p>
+                            <div class="bg-white p-3 rounded border">
+                                <strong>Why Gamma Matters:</strong>
+                                <ul class="mt-2 text-sm space-y-1">
+                                    <li>• <strong>High Gamma:</strong> Delta changes quickly = more risk/reward</li>
+                                    <li>• <strong>ATM options:</strong> Highest gamma (most acceleration)</li>
+                                    <li>• <strong>Short-term options:</strong> Gamma spikes near expiration</li>
+                                    <li>• <strong>Risk management:</strong> High gamma = position can change fast</li>
+                                </ul>
+                            </div>
+                        `,
+                        insight: "Adjust the days to expiry! Notice how gamma gets larger as expiration approaches - this is why short-term options are so sensitive!",
+                        focusGreek: "gamma"
+                    },
+                    {
+                        title: "Step 4: Theta - The Time Thief",
+                        content: `
+                            <p class="text-purple-700">Theta measures how much an option loses value each day due to time decay. It's always negative for long positions because time works against you.</p>
+                            <div class="bg-white p-3 rounded border">
+                                <strong>Time Decay Reality:</strong>
+                                <ul class="mt-2 text-sm space-y-1">
+                                    <li>• <strong>Theta = -0.15:</strong> Option loses $15 per day per contract</li>
+                                    <li>• <strong>ATM options:</strong> Highest theta (most time decay)</li>
+                                    <li>• <strong>Weekends count:</strong> Monday options show 3 days of decay</li>
+                                    <li>• <strong>Final weeks:</strong> Theta accelerates dramatically</li>
+                                </ul>
+                            </div>
+                        `,
+                        insight: "Reduce the days to expiry and watch Theta become more negative! Time decay accelerates as expiration approaches - this is the option seller's friend!",
+                        focusGreek: "theta"
+                    },
+                    {
+                        title: "Step 5: Vega - The Volatility Amplifier",
+                        content: `
+                            <p class="text-purple-700">Vega measures how much an option's price changes when volatility increases by 1%. Higher volatility means higher option prices because there's more chance of big moves.</p>
+                            <div class="bg-white p-3 rounded border">
+                                <strong>Volatility Impact:</strong>
+                                <ul class="mt-2 text-sm space-y-1">
+                                    <li>• <strong>Vega = 0.20:</strong> Price rises $20 per 1% volatility increase</li>
+                                    <li>• <strong>ATM options:</strong> Highest vega (most vol sensitivity)</li>
+                                    <li>• <strong>Earnings/events:</strong> Vol often spikes before, crashes after</li>
+                                    <li>• <strong>Long options:</strong> Want high vol, short options want low vol</li>
+                                </ul>
+                            </div>
+                        `,
+                        insight: "Adjust the volatility slider and see how dramatically option prices change! This is why options are expensive before earnings announcements!",
+                        focusGreek: "vega"
+                    }
+                ]
+            },
+            'options-basics': {
+                totalSteps: 6,
+                steps: [
+                    {
+                        title: "Step 1: What is an Option?",
+                        content: `
+                            <p class="text-pink-700">An option is a contract that gives you the RIGHT (not obligation) to buy or sell a stock at a specific price by a certain date. Think of it like a reservation at a restaurant - you have the right to use it, but you don't have to.</p>
+                            <div class="bg-white p-3 rounded border">
+                                <strong>Key Components:</strong>
+                                <ul class="mt-2 text-sm space-y-1">
+                                    <li>• <strong>Strike Price:</strong> The price at which you can buy/sell</li>
+                                    <li>• <strong>Expiration Date:</strong> When the option expires</li>
+                                    <li>• <strong>Premium:</strong> The cost to buy the option</li>
+                                    <li>• <strong>Underlying Asset:</strong> The stock the option is based on</li>
+                                </ul>
+                            </div>
+                        `,
+                        insight: "Options give you leverage and limited risk. You can control 100 shares for much less money than buying the stock outright!",
+                        demo: {
+                            type: "basic_example",
+                            content: `
+                                <div class="bg-blue-100 p-3 rounded">
+                                    <div class="text-sm font-medium text-blue-800">Example: AAPL Call Option</div>
+                                    <div class="text-xs text-blue-600 mt-1">
+                                        <div>Current AAPL Price: $150</div>
+                                        <div>Strike Price: $155</div>
+                                        <div>Expires: 30 days</div>
+                                        <div>Premium: $3.50</div>
+                                    </div>
+                                </div>
+                                <div class="text-sm mt-2">
+                                    <strong>What this means:</strong> You pay $350 ($3.50 × 100 shares) for the right to buy 100 AAPL shares at $155 each, anytime in the next 30 days.
+                                </div>
+                            `
+                        }
+                    },
+                    {
+                        title: "Step 2: Calls vs Puts",
+                        content: `
+                            <p class="text-pink-700">There are two types of options: Calls and Puts. Think of them as betting on whether a stock will go up or down.</p>
+                            <div class="bg-white p-3 rounded border">
+                                <strong>Call Options:</strong>
+                                <ul class="mt-2 text-sm space-y-1">
+                                    <li>• <strong>Right to BUY</strong> at strike price</li>
+                                    <li>• <strong>Bullish:</strong> You think stock will go UP</li>
+                                    <li>• <strong>Profit when:</strong> Stock price > Strike + Premium</li>
+                                    <li>• <strong>Max Loss:</strong> Premium paid</li>
+                                </ul>
+                                <strong class="block mt-3">Put Options:</strong>
+                                <ul class="mt-2 text-sm space-y-1">
+                                    <li>• <strong>Right to SELL</strong> at strike price</li>
+                                    <li>• <strong>Bearish:</strong> You think stock will go DOWN</li>
+                                    <li>• <strong>Profit when:</strong> Stock price < Strike - Premium</li>
+                                    <li>• <strong>Max Loss:</strong> Premium paid</li>
+                                </ul>
+                            </div>
+                        `,
+                        insight: "Calls profit from UP moves, Puts profit from DOWN moves. Your maximum loss is always limited to the premium you paid!",
+                        demo: {
+                            type: "call_put_comparison",
+                            content: `
+                                <div class="space-y-2">
+                                    <div class="bg-green-100 p-2 rounded text-xs">
+                                        <strong class="text-green-800">CALL EXAMPLE</strong><br>
+                                        AAPL $155 Call @ $3.50<br>
+                                        If AAPL → $160: Profit = $160-$155-$3.50 = $1.50/share
+                                    </div>
+                                    <div class="bg-red-100 p-2 rounded text-xs">
+                                        <strong class="text-red-800">PUT EXAMPLE</strong><br>
+                                        AAPL $145 Put @ $2.25<br>
+                                        If AAPL → $140: Profit = $145-$140-$2.25 = $2.75/share
+                                    </div>
+                                </div>
+                            `
+                        }
+                    },
+                    {
+                        title: "Step 3: In-the-Money vs Out-of-the-Money",
+                        content: `
+                            <p class="text-pink-700">Options are classified based on their relationship to the current stock price. This determines their intrinsic value.</p>
+                            <div class="bg-white p-3 rounded border">
+                                <strong>For CALLS (Stock = $150):</strong>
+                                <ul class="mt-2 text-sm space-y-1">
+                                    <li>• <strong>ITM:</strong> Strike < $150 (e.g., $145 call) - Has intrinsic value</li>
+                                    <li>• <strong>ATM:</strong> Strike = $150 (e.g., $150 call) - At the money</li>
+                                    <li>• <strong>OTM:</strong> Strike > $150 (e.g., $155 call) - Only time value</li>
+                                </ul>
+                                <strong class="block mt-3">For PUTS (Stock = $150):</strong>
+                                <ul class="mt-2 text-sm space-y-1">
+                                    <li>• <strong>ITM:</strong> Strike > $150 (e.g., $155 put) - Has intrinsic value</li>
+                                    <li>• <strong>ATM:</strong> Strike = $150 (e.g., $150 put) - At the money</li>
+                                    <li>• <strong>OTM:</strong> Strike < $150 (e.g., $145 put) - Only time value</li>
+                                </ul>
+                            </div>
+                        `,
+                        insight: "ITM options are more expensive but safer. OTM options are cheaper but require bigger stock moves to be profitable!",
+                        demo: {
+                            type: "moneyness_table",
+                            content: `
+                                <div class="text-xs">
+                                    <div class="grid grid-cols-3 gap-1 mb-2 font-bold text-center">
+                                        <div class="bg-red-200 p-1 rounded">OTM</div>
+                                        <div class="bg-yellow-200 p-1 rounded">ATM</div>
+                                        <div class="bg-green-200 p-1 rounded">ITM</div>
+                                    </div>
+                                    <div class="text-center text-gray-600 text-xs mb-1">AAPL @ $150</div>
+                                    <div class="space-y-1">
+                                        <div class="flex justify-between text-xs">
+                                            <span>$160 Call:</span><span class="text-red-600">OTM - $0.50</span>
+                                        </div>
+                                        <div class="flex justify-between text-xs">
+                                            <span>$150 Call:</span><span class="text-yellow-600">ATM - $3.50</span>
+                                        </div>
+                                        <div class="flex justify-between text-xs">
+                                            <span>$140 Call:</span><span class="text-green-600">ITM - $12.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `
+                        }
+                    },
+                    {
+                        title: "Step 4: Time Decay - Your Enemy or Friend?",
+                        content: `
+                            <p class="text-pink-700">Time decay (Theta) is the enemy of option buyers and the friend of option sellers. Every day that passes, options lose value due to approaching expiration.</p>
+                            <div class="bg-white p-3 rounded border">
+                                <strong>Time Decay Facts:</strong>
+                                <ul class="mt-2 text-sm space-y-1">
+                                    <li>• <strong>Accelerates:</strong> Decay speeds up in final 30 days</li>
+                                    <li>• <strong>ATM highest:</strong> At-the-money options lose most time value</li>
+                                    <li>• <strong>Weekends count:</strong> 3 days of decay hit on Monday</li>
+                                    <li>• <strong>Never stops:</strong> Decay happens even when markets are closed</li>
+                                </ul>
+                                <strong class="block mt-3">Strategy Impact:</strong>
+                                <ul class="mt-2 text-sm space-y-1">
+                                    <li>• <strong>Buying options:</strong> Time decay works against you</li>
+                                    <li>• <strong>Selling options:</strong> Time decay works for you</li>
+                                </ul>
+                            </div>
+                        `,
+                        insight: "Time decay is why many option buyers lose money even when they're right about direction. Factor in time decay to your predictions!",
+                        demo: {
+                            type: "time_decay_chart",
+                            content: `
+                                <div class="bg-white p-2 rounded border">
+                                    <div class="text-xs text-center mb-2 font-bold">Option Value Over Time</div>
+                                    <div class="space-y-1 text-xs">
+                                        <div class="flex justify-between"><span>90 days:</span><span>$5.50</span></div>
+                                        <div class="flex justify-between"><span>60 days:</span><span>$4.20</span></div>
+                                        <div class="flex justify-between"><span>30 days:</span><span>$2.80</span></div>
+                                        <div class="flex justify-between"><span>7 days:</span><span>$1.10</span></div>
+                                        <div class="flex justify-between"><span>1 day:</span><span>$0.15</span></div>
+                                    </div>
+                                    <div class="text-xs text-red-600 text-center mt-2">
+                                        Stock stayed at $150, but option lost 97% of value!
+                                    </div>
+                                </div>
+                            `
+                        }
+                    },
+                    {
+                        title: "Step 5: Volatility - The Option's Best Friend",
+                        content: `
+                            <p class="text-pink-700">Volatility is the amount a stock price moves up and down. Higher volatility = higher option prices, because there's more chance of big profitable moves.</p>
+                            <div class="bg-white p-3 rounded border">
+                                <strong>Volatility Types:</strong>
+                                <ul class="mt-2 text-sm space-y-1">
+                                    <li>• <strong>Historical Vol:</strong> How much stock moved in the past</li>
+                                    <li>• <strong>Implied Vol:</strong> What market expects future movement to be</li>
+                                    <li>• <strong>Vol Crush:</strong> IV drops after earnings/events</li>
+                                </ul>
+                                <strong class="block mt-3">Trading Impact:</strong>
+                                <ul class="mt-2 text-sm space-y-1">
+                                    <li>• <strong>Before earnings:</strong> IV spikes, options get expensive</li>
+                                    <li>• <strong>After earnings:</strong> IV crashes, options lose value fast</li>
+                                    <li>• <strong>Buy low IV:</strong> When market is calm</li>
+                                    <li>• <strong>Sell high IV:</strong> When market expects big moves</li>
+                                </ul>
+                            </div>
+                        `,
+                        insight: "You can be right about direction but still lose money if volatility drops! Always check IV before buying options.",
+                        demo: {
+                            type: "volatility_impact",
+                            content: `
+                                <div class="space-y-2 text-xs">
+                                    <div class="bg-blue-100 p-2 rounded">
+                                        <strong>Low Volatility (15%)</strong><br>
+                                        AAPL $155 Call: $1.20<br>
+                                        Market expects small moves
+                                    </div>
+                                    <div class="bg-orange-100 p-2 rounded">
+                                        <strong>High Volatility (45%)</strong><br>
+                                        AAPL $155 Call: $6.80<br>
+                                        Market expects big moves (earnings week)
+                                    </div>
+                                    <div class="text-center text-gray-600">
+                                        Same option, 467% price difference!
+                                    </div>
+                                </div>
+                            `
+                        }
+                    },
+                    {
+                        title: "Step 6: Common Beginner Mistakes",
+                        content: `
+                            <p class="text-pink-700">Learn from others' mistakes! Here are the most common pitfalls that trap new options traders.</p>
+                            <div class="bg-white p-3 rounded border">
+                                <strong>Top 5 Beginner Mistakes:</strong>
+                                <ul class="mt-2 text-sm space-y-1">
+                                    <li>• <strong>Buying OTM weeklies:</strong> Low probability, high decay</li>
+                                    <li>• <strong>Ignoring time decay:</strong> Not factoring in daily losses</li>
+                                    <li>• <strong>Chasing lottery tickets:</strong> Deep OTM "cheap" options</li>
+                                    <li>• <strong>Not taking profits:</strong> Holding winning trades too long</li>
+                                    <li>• <strong>Buying high IV:</strong> Overpaying right before vol crush</li>
+                                </ul>
+                                <strong class="block mt-3">Smart Strategies:</strong>
+                                <ul class="mt-2 text-sm space-y-1">
+                                    <li>• <strong>Start with ATM/ITM:</strong> Higher probability trades</li>
+                                    <li>• <strong>Give yourself time:</strong> 45+ days to expiration</li>
+                                    <li>• <strong>Take profits at 25-50%:</strong> Don't be greedy</li>
+                                    <li>• <strong>Paper trade first:</strong> Practice without real money</li>
+                                </ul>
+                            </div>
+                        `,
+                        insight: "Most option buyers lose money not because they're wrong about direction, but because they ignore time decay and volatility!",
+                        demo: {
+                            type: "mistake_examples",
+                            content: `
+                                <div class="space-y-2 text-xs">
+                                    <div class="bg-red-100 p-2 rounded border-l-4 border-red-400">
+                                        <strong class="text-red-800">❌ Bad Trade</strong><br>
+                                        Buy $180 AAPL calls expiring Friday<br>
+                                        Stock at $150, needs 20% gain in 3 days
+                                    </div>
+                                    <div class="bg-green-100 p-2 rounded border-l-4 border-green-400">
+                                        <strong class="text-green-800">✅ Better Trade</strong><br>
+                                        Buy $155 AAPL calls expiring in 60 days<br>
+                                        Stock at $150, needs 3.3% gain with time
+                                    </div>
+                                </div>
+                            `
+                        }
+                    }
+                ]
+            }
+        };
+
+        function showTutorial(tutorialType) {
+            // Hide all tutorial content
+            const tutorials = document.querySelectorAll('.tutorial-content');
+            tutorials.forEach(tutorial => {
+                tutorial.classList.add('hidden');
+            });
+            
+            // Reset button styles  
+            const buttons = ['greeksTutorialBtn', 'optionsBasicsTutorialBtn', 'pricingModelsTutorialBtn', 'riskManagementTutorialBtn'];
+            buttons.forEach(btn => {
+                const element = document.getElementById(btn);
+                if (element) {
+                    element.className = element.className.replace(/bg-\w+-700/, 'bg-gray-400');
+                }
+            });
+            
+            // Show selected tutorial
+            const targetTutorial = document.getElementById(tutorialType + 'Tutorial');
+            if (targetTutorial) {
+                targetTutorial.classList.remove('hidden');
+            }
+            
+            // Highlight selected button
+            const selectedBtn = document.getElementById(tutorialType + 'TutorialBtn');
+            if (selectedBtn) {
+                selectedBtn.className = selectedBtn.className.replace('bg-gray-400', getTutorialButtonColor(tutorialType));
+            }
+            
+            // Initialize tutorial based on type
+            if (tutorialType === 'greeks') {
+                currentTutorial = 'greeks';
+                currentTutorialStep = 0;
+                updateTutorialStep();
+                initializeTutorialSliders();
+            } else if (tutorialType === 'options-basics') {
+                currentTutorial = 'options-basics';
+                currentTutorialStep = 0;
+                updateOptionsBasicsStep();
+            }
+        }
+        
+        function getTutorialButtonColor(tutorialType) {
+            const colors = {
+                'greeks': 'bg-purple-700',
+                'options-basics': 'bg-pink-700',
+                'pricing-models': 'bg-indigo-700',
+                'risk-management': 'bg-emerald-700'
+            };
+            return colors[tutorialType] || 'bg-purple-700';
+        }
+        
+        function nextTutorialStep() {
+            const tutorial = tutorialContent[currentTutorial];
+            if (currentTutorialStep < tutorial.totalSteps - 1) {
+                currentTutorialStep++;
+                updateTutorialStep();
+            }
+        }
+        
+        function previousTutorialStep() {
+            if (currentTutorialStep > 0) {
+                currentTutorialStep--;
+                updateTutorialStep();
+            }
+        }
+        
+        function updateTutorialStep() {
+            const tutorial = tutorialContent[currentTutorial];
+            const step = tutorial.steps[currentTutorialStep];
+            
+            // Update progress
+            document.getElementById('tutorialProgress').textContent = `Step ${currentTutorialStep + 1} of ${tutorial.totalSteps}`;
+            const progressPercentage = ((currentTutorialStep + 1) / tutorial.totalSteps) * 100;
+            document.getElementById('progressBar').style.width = progressPercentage + '%';
+            
+            // Update content
+            document.getElementById('tutorialStep').innerHTML = `
+                <div class="text-lg font-semibold text-purple-800">${step.title}</div>
+                ${step.content}
+            `;
+            
+            // Update insight
+            document.getElementById('tutorialInsight').textContent = step.insight;
+            
+            // Update buttons
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            prevBtn.disabled = currentTutorialStep === 0;
+            prevBtn.className = currentTutorialStep === 0 
+                ? "px-4 py-2 bg-gray-300 text-gray-500 rounded-lg font-medium cursor-not-allowed"
+                : "px-4 py-2 bg-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-400 transition-colors";
+            
+            nextBtn.textContent = currentTutorialStep === tutorial.totalSteps - 1 ? "Complete!" : "Next →";
+            if (currentTutorialStep === tutorial.totalSteps - 1) {
+                nextBtn.onclick = function() {
+                    alert("🎉 Congratulations! You've completed the Greeks tutorial. Try exploring the other sections of the platform!");
+                };
+            } else {
+                nextBtn.onclick = nextTutorialStep;
+            }
+            
+            // Update tutorial Greeks calculation
+            updateTutorialGreeks();
+        }
+        
+        function initializeTutorialSliders() {
+            // Stock price slider
+            const stockSlider = document.getElementById('tutorialStockSlider');
+            stockSlider.addEventListener('input', function() {
+                document.getElementById('tutorialStockPrice').textContent = '$' + this.value;
+                updateTutorialGreeks();
+            });
+            
+            // Days slider
+            const daysSlider = document.getElementById('tutorialDaysSlider');
+            daysSlider.addEventListener('input', function() {
+                document.getElementById('tutorialDaysValue').textContent = this.value;
+                updateTutorialGreeks();
+            });
+            
+            // Volatility slider
+            const volSlider = document.getElementById('tutorialVolSlider');
+            volSlider.addEventListener('input', function() {
+                document.getElementById('tutorialVolValue').textContent = this.value + '%';
+                updateTutorialGreeks();
+            });
+            
+            // Initial calculation
+            updateTutorialGreeks();
+        }
+        
+        function updateTutorialGreeks() {
+            const stockPrice = parseFloat(document.getElementById('tutorialStockSlider').value);
+            const daysToExpiry = parseInt(document.getElementById('tutorialDaysSlider').value);
+            const volatility = parseFloat(document.getElementById('tutorialVolSlider').value) / 100;
+            
+            // Use simplified Black-Scholes for tutorial
+            const strikePrice = 105; // Fixed strike for tutorial
+            const riskFreeRate = 0.04;
+            const timeToExpiry = daysToExpiry / 365;
+            
+            try {
+                // Calculate Greeks using our existing function
+                const greeks = calculateBlackScholesGreeks(stockPrice, strikePrice, timeToExpiry, riskFreeRate, volatility);
+                
+                // Update display with highlighting for current step
+                const currentStep = tutorialContent[currentTutorial].steps[currentTutorialStep];
+                const focusGreek = currentStep.focusGreek;
+                
+                document.getElementById('tutorialDelta').innerHTML = 
+                    (focusGreek === 'delta' ? '<span class="bg-yellow-200 px-1 rounded">' : '') + 
+                    greeks.delta.toFixed(3) + 
+                    (focusGreek === 'delta' ? '</span>' : '');
+                
+                document.getElementById('tutorialGamma').innerHTML = 
+                    (focusGreek === 'gamma' ? '<span class="bg-yellow-200 px-1 rounded">' : '') + 
+                    greeks.gamma.toFixed(3) + 
+                    (focusGreek === 'gamma' ? '</span>' : '');
+                
+                document.getElementById('tutorialTheta').innerHTML = 
+                    (focusGreek === 'theta' ? '<span class="bg-yellow-200 px-1 rounded">' : '') + 
+                    greeks.theta.toFixed(3) + 
+                    (focusGreek === 'theta' ? '</span>' : '');
+                
+                document.getElementById('tutorialVega').innerHTML = 
+                    (focusGreek === 'vega' ? '<span class="bg-yellow-200 px-1 rounded">' : '') + 
+                    greeks.vega.toFixed(3) + 
+                    (focusGreek === 'vega' ? '</span>' : '');
+                    
+            } catch (error) {
+                console.error('Tutorial Greeks calculation error:', error);
+            }
+        }
+        
+        function calculateBlackScholesGreeks(S, K, T, r, sigma) {
+            // Black-Scholes Greeks calculation for tutorial
+            const d1 = (Math.log(S / K) + (r + 0.5 * sigma * sigma) * T) / (sigma * Math.sqrt(T));
+            const d2 = d1 - sigma * Math.sqrt(T);
+            
+            // Standard normal CDF approximation
+            function normalCDF(x) {
+                return 0.5 * (1 + erf(x / Math.sqrt(2)));
+            }
+            
+            // Standard normal PDF
+            function normalPDF(x) {
+                return Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
+            }
+            
+            // Error function approximation
+            function erf(x) {
+                const a1 =  0.254829592;
+                const a2 = -0.284496736;
+                const a3 =  1.421413741;
+                const a4 = -1.453152027;
+                const a5 =  1.061405429;
+                const p  =  0.3275911;
+                const sign = x < 0 ? -1 : 1;
+                x = Math.abs(x);
+                const t = 1.0 / (1.0 + p * x);
+                const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+                return sign * y;
+            }
+            
+            const delta = normalCDF(d1);
+            const gamma = normalPDF(d1) / (S * sigma * Math.sqrt(T));
+            const theta = -(S * normalPDF(d1) * sigma / (2 * Math.sqrt(T)) + r * K * Math.exp(-r * T) * normalCDF(d2)) / 365;
+            const vega = S * normalPDF(d1) * Math.sqrt(T) / 100;
+            
+            return { delta, gamma, theta, vega };
+        }
+
+        // ============================================================================
+        // OPTIONS BASICS TUTORIAL FUNCTIONS
+        // ============================================================================
+
+        let currentOptionsBasicsStep = 0;
+
+        function nextOptionsBasicsStep() {
+            const tutorial = tutorialContent['options-basics'];
+            if (currentOptionsBasicsStep < tutorial.totalSteps - 1) {
+                currentOptionsBasicsStep++;
+                updateOptionsBasicsStep();
+            }
+        }
+        
+        function previousOptionsBasicsStep() {
+            if (currentOptionsBasicsStep > 0) {
+                currentOptionsBasicsStep--;
+                updateOptionsBasicsStep();
+            }
+        }
+        
+        function updateOptionsBasicsStep() {
+            const tutorial = tutorialContent['options-basics'];
+            const step = tutorial.steps[currentOptionsBasicsStep];
+            
+            // Update progress
+            document.getElementById('optionsBasicsProgress').textContent = `Step ${currentOptionsBasicsStep + 1} of ${tutorial.totalSteps}`;
+            const progressPercentage = ((currentOptionsBasicsStep + 1) / tutorial.totalSteps) * 100;
+            document.getElementById('optionsBasicsProgressBar').style.width = progressPercentage + '%';
+            
+            // Update content
+            document.getElementById('optionsBasicsStep').innerHTML = `
+                <div class="text-lg font-semibold text-pink-800">${step.title}</div>
+                ${step.content}
+            `;
+            
+            // Update demo section
+            document.getElementById('optionsBasicsDemo').innerHTML = step.demo.content;
+            
+            // Update insight
+            document.getElementById('optionsBasicsInsight').textContent = step.insight;
+            
+            // Update buttons
+            const prevBtn = document.getElementById('optionsBasicsPrevBtn');
+            const nextBtn = document.getElementById('optionsBasicsNextBtn');
+            
+            prevBtn.disabled = currentOptionsBasicsStep === 0;
+            prevBtn.className = currentOptionsBasicsStep === 0 
+                ? "px-4 py-2 bg-gray-300 text-gray-500 rounded-lg font-medium cursor-not-allowed"
+                : "px-4 py-2 bg-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-400 transition-colors";
+            
+            nextBtn.textContent = currentOptionsBasicsStep === tutorial.totalSteps - 1 ? "Complete!" : "Next →";
+            if (currentOptionsBasicsStep === tutorial.totalSteps - 1) {
+                nextBtn.onclick = function() {
+                    alert("🎉 Excellent! You've completed the Options Basics tutorial. You now understand the fundamentals of options trading. Try the other tutorials to deepen your knowledge!");
+                };
+            } else {
+                nextBtn.onclick = nextOptionsBasicsStep;
+            }
+            
+            // Update visualization based on step
+            updateOptionsBasicsVisualization();
+        }
+        
+        function updateOptionsBasicsVisualization() {
+            const visualizationDiv = document.getElementById('optionsBasicsVisualization');
+            const step = currentOptionsBasicsStep;
+            
+            switch(step) {
+                case 0: // What is an option
+                    visualizationDiv.innerHTML = `
+                        <div class="h-32 bg-white rounded border flex items-center justify-center">
+                            <div class="text-center">
+                                <div class="text-sm font-bold text-blue-600 mb-2">Contract Structure</div>
+                                <div class="text-xs space-y-1">
+                                    <div>👤 You ←→ 📄 Option Contract ←→ 📈 AAPL Stock</div>
+                                    <div class="text-green-600">RIGHT to buy at $155</div>
+                                    <div class="text-red-600">Cost: $3.50 × 100 = $350</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 1: // Calls vs Puts
+                    visualizationDiv.innerHTML = `
+                        <canvas id="callPutChart" width="260" height="120" class="bg-white rounded border"></canvas>
+                    `;
+                    drawCallPutChart();
+                    break;
+                case 2: // Moneyness
+                    visualizationDiv.innerHTML = `
+                        <div class="h-32 bg-white rounded border p-2">
+                            <div class="text-xs font-bold text-center mb-2">Option Values at AAPL $150</div>
+                            <div class="space-y-1 text-xs">
+                                <div class="flex justify-between items-center">
+                                    <span>$140 Call (ITM)</span>
+                                    <div class="w-16 bg-green-200 h-3 rounded flex items-center justify-center text-xs">$12</div>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>$150 Call (ATM)</span>
+                                    <div class="w-8 bg-yellow-200 h-3 rounded flex items-center justify-center text-xs">$3.5</div>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>$160 Call (OTM)</span>
+                                    <div class="w-2 bg-red-200 h-3 rounded flex items-center justify-center text-xs">$0.5</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 3: // Time decay
+                    visualizationDiv.innerHTML = `
+                        <canvas id="timeDecayChart" width="260" height="120" class="bg-white rounded border"></canvas>
+                    `;
+                    drawTimeDecayChart();
+                    break;
+                case 4: // Volatility
+                    visualizationDiv.innerHTML = `
+                        <canvas id="volatilityChart" width="260" height="120" class="bg-white rounded border"></canvas>
+                    `;
+                    drawVolatilityChart();
+                    break;
+                case 5: // Mistakes
+                    visualizationDiv.innerHTML = `
+                        <div class="h-32 bg-white rounded border p-2 text-xs">
+                            <div class="text-center font-bold mb-2">Probability of Profit</div>
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-red-600">$180 Call (3 days)</span>
+                                    <div class="flex items-center">
+                                        <div class="w-4 bg-red-300 h-2 rounded mr-1"></div>
+                                        <span>5%</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-green-600">$155 Call (60 days)</span>
+                                    <div class="flex items-center">
+                                        <div class="w-12 bg-green-300 h-2 rounded mr-1"></div>
+                                        <span>35%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+            }
+        }
+        
+        function drawCallPutChart() {
+            const canvas = document.getElementById('callPutChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Call profit line (green)
+            ctx.strokeStyle = '#10b981';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(20, 80);
+            ctx.lineTo(120, 80);
+            ctx.lineTo(220, 20);
+            ctx.stroke();
+            
+            // Put profit line (red)
+            ctx.strokeStyle = '#ef4444';
+            ctx.beginPath();
+            ctx.moveTo(20, 20);
+            ctx.lineTo(120, 80);
+            ctx.lineTo(220, 80);
+            ctx.stroke();
+            
+            // Labels
+            ctx.fillStyle = '#000';
+            ctx.font = '10px Arial';
+            ctx.fillText('Call Profit', 180, 15);
+            ctx.fillText('Put Profit', 180, 35);
+            ctx.fillText('Stock Price →', 100, 110);
+        }
+        
+        function drawTimeDecayChart() {
+            const canvas = document.getElementById('timeDecayChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Time decay curve
+            ctx.strokeStyle = '#dc2626';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(20, 20);
+            ctx.quadraticCurveTo(120, 30, 220, 100);
+            ctx.stroke();
+            
+            // Labels
+            ctx.fillStyle = '#000';
+            ctx.font = '10px Arial';
+            ctx.fillText('Option Value', 10, 15);
+            ctx.fillText('Days to Expiry →', 100, 115);
+            ctx.fillText('90d: $5.50', 25, 35);
+            ctx.fillText('1d: $0.15', 180, 95);
+        }
+        
+        function drawVolatilityChart() {
+            const canvas = document.getElementById('volatilityChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Low vol bar
+            ctx.fillStyle = '#3b82f6';
+            ctx.fillRect(50, 70, 30, 30);
+            
+            // High vol bar
+            ctx.fillStyle = '#f59e0b';
+            ctx.fillRect(150, 20, 30, 80);
+            
+            // Labels
+            ctx.fillStyle = '#000';
+            ctx.font = '10px Arial';
+            ctx.fillText('Low Vol', 50, 115);
+            ctx.fillText('15%', 58, 90);
+            ctx.fillText('$1.20', 55, 85);
+            ctx.fillText('High Vol', 145, 115);
+            ctx.fillText('45%', 158, 40);
+            ctx.fillText('$6.80', 155, 35);
         }
 
         // ============================================================================
