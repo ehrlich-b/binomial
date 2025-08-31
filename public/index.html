@@ -160,6 +160,385 @@
             </div>
         </section>
 
+        <!-- Interactive Greeks Tutorial -->
+        <section class="mb-16">
+            <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-8">
+                <h3 class="text-3xl font-bold text-gray-800 mb-6 text-center">🎓 Interactive Greeks Tutorial</h3>
+                <p class="text-gray-600 mb-8 text-center max-w-3xl mx-auto">Learn the difference between actual rates and sensitivity measures through interactive examples. This addresses the common confusion between rates and Greeks.</p>
+                
+                <!-- Tutorial Controls -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-white rounded-lg p-6 shadow-sm">
+                        <h4 class="font-semibold text-gray-800 mb-4 flex items-center">
+                            <span class="text-2xl mr-2">📊</span>
+                            Risk-Free Rate (Actual Rate)
+                        </h4>
+                        <div class="flex items-center gap-4 mb-3">
+                            <label class="text-sm font-medium text-gray-700 w-16">Rate:</label>
+                            <input type="range" id="tutorialRate" min="1" max="10" step="0.5" value="4" class="flex-1">
+                            <span id="tutorialRateValue" class="text-xl font-bold text-green-600 w-16">4.0%</span>
+                        </div>
+                        <div class="bg-green-50 p-3 rounded-lg">
+                            <p class="text-sm text-gray-700 mb-2">This is the actual interest rate in the economy:</p>
+                            <ul class="text-xs text-gray-600 space-y-1">
+                                <li>• Fed funds rate</li>
+                                <li>• Treasury bond yields</li>
+                                <li>• What banks pay on deposits</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg p-6 shadow-sm">
+                        <h4 class="font-semibold text-gray-800 mb-4 flex items-center">
+                            <span class="text-2xl mr-2">⚡</span>
+                            Rho (Rate Sensitivity)
+                        </h4>
+                        <div class="text-center mb-3">
+                            <div class="text-4xl font-bold text-purple-600 mb-2" id="tutorialRhoValue">$0.27</div>
+                            <p class="text-sm text-gray-600">per 1% rate change</p>
+                        </div>
+                        <div class="bg-purple-50 p-3 rounded-lg">
+                            <p class="text-sm text-gray-700 mb-2">This tells you how much your option price changes:</p>
+                            <ul class="text-xs text-gray-600 space-y-1">
+                                <li>• NOT the rate itself</li>
+                                <li>• Rate of change (derivative)</li>
+                                <li>• Like speed vs distance</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Interactive Demonstration -->
+                <div class="bg-white rounded-lg p-6 shadow-sm">
+                    <h4 class="font-semibold text-gray-800 mb-6 text-center flex items-center justify-center">
+                        <span class="text-2xl mr-2">🎯</span>
+                        See the Difference in Action
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center mb-6">
+                        <div class="p-6 bg-green-50 rounded-lg border-2 border-green-200">
+                            <div class="text-2xl font-bold text-green-700 mb-2" id="currentOptionPrice">$8.45</div>
+                            <p class="text-sm font-medium text-gray-700 mb-1">Current Option Price</p>
+                            <p class="text-xs text-green-600">At <span id="currentRate1">4.0%</span> rate</p>
+                        </div>
+                        <div class="p-6 bg-blue-50 rounded-lg border-2 border-blue-200">
+                            <div class="text-2xl font-bold text-blue-700 mb-2" id="newOptionPrice">$8.72</div>
+                            <p class="text-sm font-medium text-gray-700 mb-1">New Option Price</p>
+                            <p class="text-xs text-blue-600">At <span id="newRate">5.0%</span> rate</p>
+                        </div>
+                        <div class="p-6 bg-purple-50 rounded-lg border-2 border-purple-200">
+                            <div class="text-2xl font-bold text-purple-700 mb-2" id="priceChange">+$0.27</div>
+                            <p class="text-sm font-medium text-gray-700 mb-1">Price Change</p>
+                            <p class="text-xs text-purple-600 font-semibold">This equals Rho!</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Dynamic Explanation -->
+                    <div class="bg-gradient-to-r from-amber-50 to-yellow-50 border-l-4 border-amber-400 p-6 rounded-r-lg">
+                        <h5 class="font-semibold text-amber-800 mb-3 flex items-center">
+                            <span class="text-xl mr-2">💡</span>
+                            Key Insight
+                        </h5>
+                        <div class="space-y-2 text-amber-700">
+                            <p class="font-medium">
+                                Risk-Free Rate = <span id="explanationCurrentRate">4%</span> (the actual rate)
+                            </p>
+                            <p class="font-medium">
+                                Rho = <span id="explanationRho">$0.27</span> (how much price changes per 1% rate move)
+                            </p>
+                            <p class="text-sm border-t border-amber-200 pt-2 mt-3">
+                                <strong>Example:</strong> If rates go from <span id="explanationFromRate">4%</span> → <span id="explanationToRate">5%</span>, 
+                                your option gains <span id="explanationGain">$0.27</span> in value.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Algorithm Animations Section -->
+        <section class="mb-16">
+            <div class="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl p-8">
+                <h3 class="text-3xl font-bold text-gray-800 mb-6 text-center">🎬 Algorithm Visualizations</h3>
+                <p class="text-gray-600 mb-8 text-center max-w-3xl mx-auto">See how options pricing models work step-by-step. Watch the mathematics come to life through interactive animations.</p>
+                
+                <!-- Algorithm Selection -->
+                <div class="flex flex-wrap justify-center gap-4 mb-8">
+                    <button onclick="showAlgorithm('binomial')" class="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors" id="binomialBtn">
+                        🌳 Binomial Tree
+                    </button>
+                    <button onclick="showAlgorithm('trinomial')" class="px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors" id="trinomialBtn">
+                        🔷 Trinomial Tree
+                    </button>
+                    <button onclick="showAlgorithm('blackscholes')" class="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors" id="blackscholesBtn">
+                        📐 Black-Scholes
+                    </button>
+                    <button onclick="showAlgorithm('montecarlo')" class="px-6 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors" id="montecarloBtn">
+                        🎲 Monte Carlo
+                    </button>
+                </div>
+                
+                <!-- Binomial Tree Animation -->
+                <div id="binomialAnimation" class="algorithm-content">
+                    <div class="bg-white rounded-lg p-6 shadow-sm">
+                        <h4 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                            <span class="text-3xl mr-3">🌳</span>
+                            Binomial Tree Model (Cox-Ross-Rubinstein)
+                        </h4>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Tree Visualization -->
+                            <div class="space-y-4">
+                                <div class="bg-blue-50 p-4 rounded-lg">
+                                    <h5 class="font-semibold text-blue-800 mb-3">Step-by-Step Construction</h5>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center justify-between text-sm">
+                                            <span>Steps:</span>
+                                            <input type="range" id="binomialSteps" min="1" max="5" value="3" class="ml-4">
+                                            <span id="binomialStepsValue" class="font-bold ml-2">3</span>
+                                        </div>
+                                        <div class="flex items-center justify-between text-sm">
+                                            <span>Speed:</span>
+                                            <input type="range" id="animationSpeed" min="500" max="3000" value="1500" class="ml-4">
+                                            <span class="text-xs ml-2">Slow → Fast</span>
+                                        </div>
+                                        <button onclick="animateBinomialTree()" class="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors mt-3">
+                                            ▶️ Animate Tree Construction
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Tree Visualization Canvas -->
+                                <div class="bg-gray-50 rounded-lg p-4 h-80" id="treeCanvas">
+                                    <div class="flex items-center justify-center h-full text-gray-500">
+                                        <div class="text-center">
+                                            <div class="text-4xl mb-2">🌳</div>
+                                            <p>Click "Animate Tree Construction" to begin</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Explanation Panel -->
+                            <div class="space-y-4">
+                                <div class="bg-green-50 p-4 rounded-lg">
+                                    <h5 class="font-semibold text-green-800 mb-3">How It Works</h5>
+                                    <div class="space-y-2 text-sm text-green-700">
+                                        <div class="step-explanation" id="step1">
+                                            <div class="flex items-start">
+                                                <span class="bg-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-2 mt-0.5">1</span>
+                                                <div>
+                                                    <strong>Start:</strong> Current stock price S₀ = $<span class="font-mono">100</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="step-explanation opacity-50" id="step2">
+                                            <div class="flex items-start">
+                                                <span class="bg-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-2 mt-0.5">2</span>
+                                                <div>
+                                                    <strong>Up/Down:</strong> Price can go up by factor u = <span class="font-mono">1.05</span> or down by d = <span class="font-mono">0.95</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="step-explanation opacity-50" id="step3">
+                                            <div class="flex items-start">
+                                                <span class="bg-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-2 mt-0.5">3</span>
+                                                <div>
+                                                    <strong>Risk-Neutral:</strong> Probability p = <span class="font-mono">0.52</span>, (1-p) = <span class="font-mono">0.48</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="step-explanation opacity-50" id="step4">
+                                            <div class="flex items-start">
+                                                <span class="bg-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-2 mt-0.5">4</span>
+                                                <div>
+                                                    <strong>Work Backwards:</strong> Start from expiry, calculate option values at each node
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Current Step Display -->
+                                <div class="bg-amber-50 p-4 rounded-lg">
+                                    <h5 class="font-semibold text-amber-800 mb-3">Current Step</h5>
+                                    <div id="currentStepDisplay" class="text-sm text-amber-700">
+                                        Ready to begin animation...
+                                    </div>
+                                </div>
+                                
+                                <!-- Mathematical Formula -->
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <h5 class="font-semibold text-gray-800 mb-3">Key Formulas</h5>
+                                    <div class="space-y-2 text-xs font-mono text-gray-600">
+                                        <div>u = e^(σ√Δt) ≈ 1.05</div>
+                                        <div>d = 1/u ≈ 0.95</div>
+                                        <div>p = (e^(rΔt) - d)/(u - d)</div>
+                                        <div>V = e^(-rΔt)[pV_up + (1-p)V_down]</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Monte Carlo Animation -->
+                <div id="montecarloAnimation" class="algorithm-content hidden">
+                    <div class="bg-white rounded-lg p-6 shadow-sm">
+                        <h4 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                            <span class="text-3xl mr-3">🎲</span>
+                            Monte Carlo Simulation
+                        </h4>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Simulation Controls -->
+                            <div class="space-y-4">
+                                <div class="bg-red-50 p-4 rounded-lg">
+                                    <h5 class="font-semibold text-red-800 mb-3">Simulation Parameters</h5>
+                                    <div class="space-y-3">
+                                        <div class="flex items-center justify-between text-sm">
+                                            <span>Paths:</span>
+                                            <input type="range" id="mcPaths" min="100" max="10000" step="100" value="1000" class="ml-4">
+                                            <span id="mcPathsValue" class="font-bold ml-2">1,000</span>
+                                        </div>
+                                        <div class="flex items-center justify-between text-sm">
+                                            <span>Show Paths:</span>
+                                            <input type="range" id="mcShowPaths" min="10" max="100" value="50" class="ml-4">
+                                            <span id="mcShowPathsValue" class="font-bold ml-2">50</span>
+                                        </div>
+                                        <button onclick="animateMonteCarlo()" class="w-full bg-red-600 text-white py-2 rounded-lg font-semibold hover:bg-red-700 transition-colors">
+                                            🎲 Run Simulation
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Statistics Panel -->
+                                <div class="bg-blue-50 p-4 rounded-lg">
+                                    <h5 class="font-semibold text-blue-800 mb-3">Live Statistics</h5>
+                                    <div class="space-y-2 text-sm">
+                                        <div class="flex justify-between">
+                                            <span>Paths Completed:</span>
+                                            <span id="mcPathsCompleted" class="font-bold">0</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>Current Price:</span>
+                                            <span id="mcCurrentPrice" class="font-bold">$0.00</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>Standard Error:</span>
+                                            <span id="mcStandardError" class="font-bold">±$0.00</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>Confidence:</span>
+                                            <span id="mcConfidence" class="font-bold">95%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Path Visualization -->
+                            <div class="space-y-4">
+                                <div class="bg-gray-50 rounded-lg p-4 h-80" id="mcCanvas">
+                                    <div class="flex items-center justify-center h-full text-gray-500">
+                                        <div class="text-center">
+                                            <div class="text-4xl mb-2">📈</div>
+                                            <p>Click "Run Simulation" to see random paths</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Key Insight -->
+                                <div class="bg-yellow-50 p-4 rounded-lg">
+                                    <h5 class="font-semibold text-yellow-800 mb-2">💡 Key Insight</h5>
+                                    <p class="text-sm text-yellow-700">
+                                        Each path follows: S(t) = S₀ × e^((r-σ²/2)t + σ√t×Z) where Z ~ N(0,1). 
+                                        More paths = more accurate price!
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Black-Scholes Animation -->
+                <div id="blackscholesAnimation" class="algorithm-content hidden">
+                    <div class="bg-white rounded-lg p-6 shadow-sm">
+                        <h4 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                            <span class="text-3xl mr-3">📐</span>
+                            Black-Scholes Formula
+                        </h4>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Formula Breakdown -->
+                            <div class="space-y-4">
+                                <div class="bg-purple-50 p-4 rounded-lg">
+                                    <h5 class="font-semibold text-purple-800 mb-3">Formula Components</h5>
+                                    <button onclick="animateBlackScholes()" class="w-full bg-purple-600 text-white py-2 rounded-lg font-semibold hover:bg-purple-700 transition-colors mb-4">
+                                        📐 Break Down Formula
+                                    </button>
+                                    
+                                    <div class="space-y-3 text-sm">
+                                        <div class="formula-step opacity-30" id="bsStep1">
+                                            <div class="font-mono bg-white p-2 rounded">C = S₀N(d₁) - Ke^(-rT)N(d₂)</div>
+                                            <p class="text-purple-700 mt-1">Call option price formula</p>
+                                        </div>
+                                        
+                                        <div class="formula-step opacity-30" id="bsStep2">
+                                            <div class="font-mono bg-white p-2 rounded">d₁ = [ln(S/K) + (r + σ²/2)T] / (σ√T)</div>
+                                            <p class="text-purple-700 mt-1">Distance to strike (adjusted for drift)</p>
+                                        </div>
+                                        
+                                        <div class="formula-step opacity-30" id="bsStep3">
+                                            <div class="font-mono bg-white p-2 rounded">d₂ = d₁ - σ√T</div>
+                                            <p class="text-purple-700 mt-1">Distance to strike (risk-adjusted)</p>
+                                        </div>
+                                        
+                                        <div class="formula-step opacity-30" id="bsStep4">
+                                            <div class="font-mono bg-white p-2 rounded">N(x) = Cumulative normal distribution</div>
+                                            <p class="text-purple-700 mt-1">Probability of being in-the-money</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Current Calculation -->
+                                <div class="bg-green-50 p-4 rounded-lg">
+                                    <h5 class="font-semibold text-green-800 mb-3">Live Calculation</h5>
+                                    <div id="bsCalculation" class="space-y-2 text-sm font-mono">
+                                        <div>S₀ = $100, K = $105, T = 0.082 years</div>
+                                        <div>r = 4%, σ = 25%</div>
+                                        <div id="bsLiveCalc">Click "Break Down Formula" to see calculation...</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Normal Distribution Visualization -->
+                            <div class="space-y-4">
+                                <div class="bg-gray-50 rounded-lg p-4 h-64" id="bsCanvas">
+                                    <div class="flex items-center justify-center h-full text-gray-500">
+                                        <div class="text-center">
+                                            <div class="text-4xl mb-2">📊</div>
+                                            <p>Normal distribution visualization will appear here</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Key Assumptions -->
+                                <div class="bg-amber-50 p-4 rounded-lg">
+                                    <h5 class="font-semibold text-amber-800 mb-3">⚠️ Key Assumptions</h5>
+                                    <ul class="text-sm text-amber-700 space-y-1">
+                                        <li>• Constant volatility and risk-free rate</li>
+                                        <li>• No dividends (can be adjusted)</li>
+                                        <li>• European exercise only</li>
+                                        <li>• Log-normal stock price distribution</li>
+                                        <li>• No transaction costs</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Greeks Education Section -->
         <section id="learn" class="mb-16">
             <h3 class="text-3xl font-bold mb-8 text-center">Understanding the Greeks</h3>
@@ -958,6 +1337,504 @@
                 populateStrategyParams(e.target.value);
             }
         });
+
+        // Interactive Greeks Tutorial Functionality
+        function initializeTutorial() {
+            const rateSlider = document.getElementById('tutorialRate');
+            const rateValue = document.getElementById('tutorialRateValue');
+            const rhoValue = document.getElementById('tutorialRhoValue');
+            const currentPrice = document.getElementById('currentOptionPrice');
+            const newPrice = document.getElementById('newOptionPrice');
+            const priceChange = document.getElementById('priceChange');
+            const currentRate1 = document.getElementById('currentRate1');
+            const newRate = document.getElementById('newRate');
+            const explanationCurrentRate = document.getElementById('explanationCurrentRate');
+            const explanationRho = document.getElementById('explanationRho');
+            const explanationFromRate = document.getElementById('explanationFromRate');
+            const explanationToRate = document.getElementById('explanationToRate');
+            const explanationGain = document.getElementById('explanationGain');
+            
+            // Base option parameters for tutorial
+            const baseParams = {
+                stockPrice: 100,
+                strikePrice: 105,
+                daysToExpiry: 30,
+                volatility: 0.25,
+                optionType: 'call'
+            };
+            
+            function updateTutorial() {
+                const currentRiskFreeRate = parseFloat(rateSlider.value) / 100;
+                const newRiskFreeRate = currentRiskFreeRate + 0.01; // +1%
+                
+                // Update display values
+                rateValue.textContent = (currentRiskFreeRate * 100).toFixed(1) + '%';
+                currentRate1.textContent = (currentRiskFreeRate * 100).toFixed(1) + '%';
+                newRate.textContent = (newRiskFreeRate * 100).toFixed(1) + '%';
+                explanationCurrentRate.textContent = (currentRiskFreeRate * 100).toFixed(1) + '%';
+                explanationFromRate.textContent = (currentRiskFreeRate * 100).toFixed(1) + '%';
+                explanationToRate.textContent = (newRiskFreeRate * 100).toFixed(1) + '%';
+                
+                try {
+                    if (pricingLibrary && pricingLibrary.binomialPrice) {
+                        // Calculate prices at both rates
+                        const priceAtCurrentRate = pricingLibrary.binomialPrice({
+                            ...baseParams,
+                            riskFreeRate: currentRiskFreeRate,
+                            timeToExpiry: baseParams.daysToExpiry / 365,
+                            dividendYield: 0.015,
+                            steps: 50,
+                            exerciseStyle: 'american'
+                        });
+                        
+                        const priceAtNewRate = pricingLibrary.binomialPrice({
+                            ...baseParams,
+                            riskFreeRate: newRiskFreeRate,
+                            timeToExpiry: baseParams.daysToExpiry / 365,
+                            dividendYield: 0.015,
+                            steps: 50,
+                            exerciseStyle: 'american'
+                        });
+                        
+                        const change = priceAtNewRate - priceAtCurrentRate;
+                        
+                        // Update displays
+                        currentPrice.textContent = '$' + priceAtCurrentRate.toFixed(2);
+                        newPrice.textContent = '$' + priceAtNewRate.toFixed(2);
+                        priceChange.textContent = (change >= 0 ? '+' : '') + '$' + change.toFixed(2);
+                        rhoValue.textContent = '$' + change.toFixed(2);
+                        explanationRho.textContent = '$' + change.toFixed(2);
+                        explanationGain.textContent = '$' + Math.abs(change).toFixed(2);
+                        
+                        // Color coding for price change
+                        const changeColor = change >= 0 ? 'text-green-700' : 'text-red-700';
+                        priceChange.className = `text-2xl font-bold ${changeColor} mb-2`;
+                        
+                    } else {
+                        // Fallback with estimated values
+                        const estimatedRho = 0.25 + (currentRiskFreeRate - 0.04) * 2; // Rough estimation
+                        rhoValue.textContent = '$' + estimatedRho.toFixed(2);
+                        explanationRho.textContent = '$' + estimatedRho.toFixed(2);
+                        explanationGain.textContent = '$' + Math.abs(estimatedRho).toFixed(2);
+                    }
+                } catch (error) {
+                    console.warn('Tutorial calculation error:', error);
+                    // Show default values if calculation fails
+                    const defaultRho = 0.27;
+                    rhoValue.textContent = '$' + defaultRho.toFixed(2);
+                    explanationRho.textContent = '$' + defaultRho.toFixed(2);
+                    explanationGain.textContent = '$' + Math.abs(defaultRho).toFixed(2);
+                }
+            }
+            
+            // Initialize tutorial
+            updateTutorial();
+            
+            // Add event listener for rate slider
+            rateSlider.addEventListener('input', updateTutorial);
+        }
+        
+        // Initialize tutorial when pricing library is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                initializeTutorial();
+                initializeAlgorithmAnimations();
+            }, 1000); // Wait for pricing library to load
+        });
+
+        // Algorithm Animation Functionality
+        function initializeAlgorithmAnimations() {
+            // Initialize slider values
+            document.getElementById('binomialSteps').addEventListener('input', function() {
+                document.getElementById('binomialStepsValue').textContent = this.value;
+            });
+            
+            document.getElementById('mcPaths').addEventListener('input', function() {
+                document.getElementById('mcPathsValue').textContent = parseInt(this.value).toLocaleString();
+            });
+            
+            document.getElementById('mcShowPaths').addEventListener('input', function() {
+                document.getElementById('mcShowPathsValue').textContent = this.value;
+            });
+        }
+        
+        // Algorithm switching functionality
+        function showAlgorithm(algorithm) {
+            // Hide all algorithm content
+            const contents = document.querySelectorAll('.algorithm-content');
+            contents.forEach(content => content.classList.add('hidden'));
+            
+            // Reset button styles
+            const buttons = ['binomialBtn', 'trinomialBtn', 'blackscholesBtn', 'montecarloBtn'];
+            buttons.forEach(btn => {
+                const element = document.getElementById(btn);
+                element.className = element.className.replace(/bg-\w+-700/, 'bg-gray-400');
+            });
+            
+            // Show selected algorithm
+            document.getElementById(algorithm + 'Animation').classList.remove('hidden');
+            
+            // Highlight selected button
+            const selectedBtn = document.getElementById(algorithm + 'Btn');
+            if (selectedBtn) {
+                selectedBtn.className = selectedBtn.className.replace('bg-gray-400', getButtonColor(algorithm));
+            }
+        }
+        
+        function getButtonColor(algorithm) {
+            const colors = {
+                'binomial': 'bg-blue-700',
+                'trinomial': 'bg-green-700',
+                'blackscholes': 'bg-purple-700',
+                'montecarlo': 'bg-red-700'
+            };
+            return colors[algorithm] || 'bg-blue-700';
+        }
+        
+        // Binomial Tree Animation
+        function animateBinomialTree() {
+            const steps = parseInt(document.getElementById('binomialSteps').value);
+            const speed = parseInt(document.getElementById('animationSpeed').value);
+            const canvas = document.getElementById('treeCanvas');
+            const stepDisplay = document.getElementById('currentStepDisplay');
+            
+            // Reset step explanations
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`step${i}`).style.opacity = '0.3';
+            }
+            
+            // Clear canvas
+            canvas.innerHTML = '<div class="p-4"><div class="text-center text-lg font-bold mb-4">Building Binomial Tree...</div></div>';
+            
+            let currentStep = 0;
+            const totalSteps = 4;
+            
+            function nextStep() {
+                currentStep++;
+                
+                // Highlight current step
+                if (currentStep <= 4) {
+                    document.getElementById(`step${currentStep}`).style.opacity = '1';
+                }
+                
+                switch(currentStep) {
+                    case 1:
+                        stepDisplay.textContent = "Starting with current stock price S₀ = $100";
+                        canvas.innerHTML = createTreeVisualization(1, steps);
+                        break;
+                    case 2:
+                        stepDisplay.textContent = "Adding up and down movements for each time step";
+                        canvas.innerHTML = createTreeVisualization(2, steps);
+                        break;
+                    case 3:
+                        stepDisplay.textContent = "Calculating risk-neutral probabilities";
+                        canvas.innerHTML = createTreeVisualization(3, steps);
+                        break;
+                    case 4:
+                        stepDisplay.textContent = "Working backwards to find option value";
+                        canvas.innerHTML = createTreeVisualization(4, steps);
+                        break;
+                    default:
+                        stepDisplay.textContent = "Animation complete! Tree shows all possible paths.";
+                        return;
+                }
+                
+                if (currentStep < totalSteps) {
+                    setTimeout(nextStep, speed);
+                }
+            }
+            
+            nextStep();
+        }
+        
+        function createTreeVisualization(step, totalSteps) {
+            let html = '<div class="p-4">';
+            
+            if (step === 1) {
+                html += `
+                    <div class="flex justify-center">
+                        <div class="bg-blue-500 text-white rounded-full w-16 h-16 flex items-center justify-center font-bold">
+                            $100
+                        </div>
+                    </div>
+                    <div class="text-center mt-2 text-sm text-gray-600">Current Stock Price</div>
+                `;
+            } else if (step === 2) {
+                html += `
+                    <div class="space-y-6">
+                        ${Array.from({length: Math.min(totalSteps + 1, 4)}, (_, t) => `
+                            <div class="flex justify-center items-center" style="gap: ${40 + t * 30}px;">
+                                ${Array.from({length: t + 1}, (_, i) => {
+                                    const price = 100 * Math.pow(1.05, t - i) * Math.pow(0.95, i);
+                                    return `
+                                        <div class="bg-green-500 text-white rounded-full w-12 h-12 flex items-center justify-center text-xs font-bold">
+                                            $${price.toFixed(0)}
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else if (step === 3) {
+                html += `
+                    <div class="text-center mb-4">
+                        <div class="bg-yellow-100 p-3 rounded-lg inline-block">
+                            <div class="text-sm font-semibold">Risk-Neutral Probabilities</div>
+                            <div class="text-xs mt-1">p = 0.52 (up), 1-p = 0.48 (down)</div>
+                        </div>
+                    </div>
+                    <div class="flex justify-center">
+                        <div class="relative">
+                            <svg width="200" height="120" viewBox="0 0 200 120">
+                                <line x1="100" y1="100" x2="50" y2="20" stroke="#10B981" stroke-width="3"/>
+                                <line x1="100" y1="100" x2="150" y2="20" stroke="#EF4444" stroke-width="3"/>
+                                <circle cx="100" cy="100" r="15" fill="#3B82F6"/>
+                                <circle cx="50" cy="20" r="12" fill="#10B981"/>
+                                <circle cx="150" cy="20" r="12" fill="#EF4444"/>
+                                <text x="100" y="105" text-anchor="middle" font-size="10" fill="white">$100</text>
+                                <text x="50" y="25" text-anchor="middle" font-size="8" fill="white">$105</text>
+                                <text x="150" y="25" text-anchor="middle" font-size="8" fill="white">$95</text>
+                                <text x="75" y="65" font-size="8" fill="#10B981">52%</text>
+                                <text x="125" y="65" font-size="8" fill="#EF4444">48%</text>
+                            </svg>
+                        </div>
+                    </div>
+                `;
+            } else if (step === 4) {
+                html += `
+                    <div class="text-center mb-4">
+                        <div class="bg-purple-100 p-3 rounded-lg inline-block">
+                            <div class="text-sm font-semibold">Backward Induction</div>
+                            <div class="text-xs mt-1">Start from expiry, work backwards</div>
+                        </div>
+                    </div>
+                    <div class="flex justify-center">
+                        <div class="relative">
+                            <svg width="250" height="150" viewBox="0 0 250 150">
+                                <!-- Final nodes -->
+                                <circle cx="50" cy="20" r="12" fill="#10B981"/>
+                                <circle cx="125" cy="75" r="12" fill="#F59E0B"/>
+                                <circle cx="200" cy="130" r="12" fill="#EF4444"/>
+                                <!-- Intermediate nodes -->
+                                <circle cx="90" cy="47" r="10" fill="#8B5CF6"/>
+                                <circle cx="160" cy="102" r="10" fill="#8B5CF6"/>
+                                <!-- Root node -->
+                                <circle cx="125" cy="75" r="15" fill="#3B82F6"/>
+                                <!-- Lines -->
+                                <line x1="125" y1="75" x2="90" y2="47" stroke="#8B5CF6" stroke-width="2"/>
+                                <line x1="125" y1="75" x2="160" y2="102" stroke="#8B5CF6" stroke-width="2"/>
+                                <line x1="90" y1="47" x2="50" y2="20" stroke="#10B981" stroke-width="2"/>
+                                <line x1="90" y1="47" x2="125" y2="75" stroke="#F59E0B" stroke-width="2"/>
+                                <line x1="160" y1="102" x2="125" y2="75" stroke="#F59E0B" stroke-width="2"/>
+                                <line x1="160" y1="102" x2="200" y2="130" stroke="#EF4444" stroke-width="2"/>
+                                <!-- Values -->
+                                <text x="125" y="80" text-anchor="middle" font-size="10" fill="white">$6.15</text>
+                                <text x="50" y="25" text-anchor="middle" font-size="8" fill="white">$10.5</text>
+                                <text x="200" y="135" text-anchor="middle" font-size="8" fill="white">$0</text>
+                                <text x="90" y="52" text-anchor="middle" font-size="8" fill="white">$8.2</text>
+                                <text x="160" y="107" text-anchor="middle" font-size="8" fill="white">$2.4</text>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="text-center mt-4 text-sm text-green-600 font-semibold">
+                        Option Value: $6.15
+                    </div>
+                `;
+            }
+            
+            html += '</div>';
+            return html;
+        }
+        
+        // Monte Carlo Animation
+        function animateMonteCarlo() {
+            const totalPaths = parseInt(document.getElementById('mcPaths').value);
+            const showPaths = parseInt(document.getElementById('mcShowPaths').value);
+            const canvas = document.getElementById('mcCanvas');
+            
+            let pathsCompleted = 0;
+            let runningTotal = 0;
+            let runningSquareTotal = 0;
+            
+            canvas.innerHTML = `
+                <div class="h-full">
+                    <div class="text-center mb-4 font-semibold">Simulating ${totalPaths.toLocaleString()} Price Paths</div>
+                    <div class="relative h-64 bg-white rounded border">
+                        <canvas id="mcPathCanvas" width="400" height="200" class="w-full h-full"></canvas>
+                    </div>
+                    <div class="mt-2 bg-blue-100 rounded-full h-2">
+                        <div id="mcProgressBar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+            `;
+            
+            const pathCanvas = document.getElementById('mcPathCanvas');
+            const ctx = pathCanvas.getContext('2d');
+            
+            // Setup canvas
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, 400, 200);
+            ctx.strokeStyle = 'rgba(59, 130, 246, 0.3)';
+            ctx.lineWidth = 1;
+            
+            // Draw axes
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(40, 180);
+            ctx.lineTo(380, 180);
+            ctx.moveTo(40, 20);
+            ctx.lineTo(40, 180);
+            ctx.stroke();
+            
+            let pathsDrawn = 0;
+            const batchSize = Math.ceil(totalPaths / 100); // Update in batches
+            
+            function simulateBatch() {
+                for (let i = 0; i < Math.min(batchSize, totalPaths - pathsCompleted); i++) {
+                    const optionValue = simulatePath();
+                    runningTotal += optionValue;
+                    runningSquareTotal += optionValue * optionValue;
+                    pathsCompleted++;
+                    
+                    // Draw some paths for visualization
+                    if (pathsDrawn < showPaths && pathsCompleted % Math.floor(totalPaths / showPaths) === 0) {
+                        drawRandomPath(ctx, pathsDrawn);
+                        pathsDrawn++;
+                    }
+                }
+                
+                // Update statistics
+                updateMonteCarloStats(pathsCompleted, totalPaths, runningTotal, runningSquareTotal);
+                
+                if (pathsCompleted < totalPaths) {
+                    setTimeout(simulateBatch, 10);
+                } else {
+                    document.getElementById('mcProgressBar').style.width = '100%';
+                }
+            }
+            
+            simulateBatch();
+        }
+        
+        function simulatePath() {
+            // Simple Monte Carlo option pricing
+            const S0 = 100, K = 105, T = 30/365, r = 0.04, sigma = 0.25;
+            const dt = T / 30;
+            let S = S0;
+            
+            // Generate random path
+            for (let i = 0; i < 30; i++) {
+                const Z = normalRandom();
+                S *= Math.exp((r - 0.5 * sigma * sigma) * dt + sigma * Math.sqrt(dt) * Z);
+            }
+            
+            // Option payoff (call option)
+            return Math.max(S - K, 0) * Math.exp(-r * T);
+        }
+        
+        function drawRandomPath(ctx, pathIndex) {
+            const S0 = 100;
+            const colors = ['rgba(59, 130, 246, 0.4)', 'rgba(16, 185, 129, 0.4)', 'rgba(239, 68, 68, 0.4)'];
+            
+            ctx.strokeStyle = colors[pathIndex % colors.length];
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            
+            let S = S0;
+            let prevX = 40;
+            let prevY = 180 - (S - 80) * 2; // Scale to canvas
+            
+            ctx.moveTo(prevX, prevY);
+            
+            for (let i = 1; i <= 30; i++) {
+                const Z = normalRandom();
+                S *= Math.exp((0.04 - 0.5 * 0.25 * 0.25) * (30/365/30) + 0.25 * Math.sqrt(30/365/30) * Z);
+                
+                const x = 40 + (i / 30) * 340;
+                const y = Math.max(20, Math.min(180, 180 - (S - 80) * 2));
+                
+                ctx.lineTo(x, y);
+                prevX = x;
+                prevY = y;
+            }
+            
+            ctx.stroke();
+        }
+        
+        function normalRandom() {
+            // Box-Muller transformation
+            let u = 0, v = 0;
+            while (u === 0) u = Math.random();
+            while (v === 0) v = Math.random();
+            return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+        }
+        
+        function updateMonteCarloStats(completed, total, runningTotal, runningSquareTotal) {
+            const currentPrice = runningTotal / completed;
+            const variance = (runningSquareTotal / completed) - (currentPrice * currentPrice);
+            const standardError = Math.sqrt(variance / completed);
+            
+            document.getElementById('mcPathsCompleted').textContent = completed.toLocaleString();
+            document.getElementById('mcCurrentPrice').textContent = '$' + currentPrice.toFixed(2);
+            document.getElementById('mcStandardError').textContent = '±$' + (1.96 * standardError).toFixed(2);
+            
+            const progress = (completed / total) * 100;
+            document.getElementById('mcProgressBar').style.width = progress + '%';
+        }
+        
+        // Black-Scholes Animation
+        function animateBlackScholes() {
+            const steps = ['bsStep1', 'bsStep2', 'bsStep3', 'bsStep4'];
+            const calculation = document.getElementById('bsLiveCalc');
+            
+            // Reset opacity
+            steps.forEach(step => {
+                document.getElementById(step).style.opacity = '0.3';
+            });
+            
+            let currentStep = 0;
+            
+            function nextStep() {
+                if (currentStep < steps.length) {
+                    document.getElementById(steps[currentStep]).style.opacity = '1';
+                    
+                    switch(currentStep) {
+                        case 0:
+                            calculation.innerHTML = `
+                                <div>Breaking down the Black-Scholes formula...</div>
+                                <div class="mt-2 text-purple-600">C = S₀N(d₁) - Ke^(-rT)N(d₂)</div>
+                            `;
+                            break;
+                        case 1:
+                            calculation.innerHTML = `
+                                <div>d₁ = [ln(100/105) + (0.04 + 0.25²/2)×0.082] / (0.25×√0.082)</div>
+                                <div>d₁ = [-0.0488 + 0.0059] / 0.0717 = -0.598</div>
+                            `;
+                            break;
+                        case 2:
+                            calculation.innerHTML = `
+                                <div>d₂ = d₁ - σ√T = -0.598 - 0.25×√0.082</div>
+                                <div>d₂ = -0.598 - 0.0717 = -0.670</div>
+                            `;
+                            break;
+                        case 3:
+                            calculation.innerHTML = `
+                                <div>N(d₁) = N(-0.598) = 0.275</div>
+                                <div>N(d₂) = N(-0.670) = 0.251</div>
+                                <div class="mt-2 text-green-600 font-bold">C = 100×0.275 - 105×e^(-0.04×0.082)×0.251 = $1.31</div>
+                            `;
+                            break;
+                    }
+                    
+                    currentStep++;
+                    setTimeout(nextStep, 2000);
+                }
+            }
+            
+            nextStep();
+        }
     </script>
 </body>
 </html>

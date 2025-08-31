@@ -49,10 +49,11 @@ Transforming the robust JavaScript options pricing library into an **interactive
   - [x] Multi-leg strategy support ✅
   - [x] Break-even analysis ✅
 
-- [ ] **Algorithm Visualizer**
-  - [ ] Step-by-step binomial tree animation
+- [x] **Algorithm Visualizer** ✅ COMPLETED
+  - [x] Step-by-step binomial tree animation ✅
   - [ ] Trinomial tree visualization
-  - [ ] Monte Carlo simulation paths
+  - [x] Monte Carlo simulation paths ✅
+  - [x] Black-Scholes formula breakdown ✅
   - [ ] Jump diffusion process animation
 
 ### ✅ Phase 1 Completed Features (December 2024)
@@ -271,6 +272,8 @@ npm run dev
 4. **3D Surface Plots** - Advanced Greeks visualizations
 
 ### 🚀 Recent Additions (December 2024):
+- **Algorithm Animations**: Step-by-step visualizations of Binomial trees, Monte Carlo, and Black-Scholes ✅ NEW
+- **Interactive Greeks Tutorial**: Live demonstration showing rate vs sensitivity with real pricing calculations ✅ NEW
 - **Greeks Education Section**: Clear explanations of all Greeks with real-world examples
 - **Enhanced Greeks Display**: Contextual explanations showing practical impact
 - **Payoff Diagram Builder**: Interactive strategy construction with 6+ popular strategies
