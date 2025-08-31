@@ -15,6 +15,74 @@
     <!-- Math.js for calculations -->
     <script src="https://cdn.jsdelivr.net/npm/mathjs@11.11.0/lib/browser/math.min.js"></script>
     
+    <!-- Three.js for 3D visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.156.1/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.156.1/examples/js/controls/OrbitControls.js"></script>
+    
+    <!-- Fallback OrbitControls in case CDN fails -->
+    <script>
+        // OrbitControls fallback implementation
+        if (typeof THREE !== 'undefined' && !THREE.OrbitControls) {
+            THREE.OrbitControls = class OrbitControls {
+                constructor(camera, domElement) {
+                    this.camera = camera;
+                    this.domElement = domElement;
+                    this.enableDamping = true;
+                    this.dampingFactor = 0.05;
+                    this.enableZoom = true;
+                    this.enableRotate = true;
+                    this.enablePan = true;
+                    
+                    this.mouseX = 0;
+                    this.mouseY = 0;
+                    this.isMouseDown = false;
+                    
+                    this.initEventListeners();
+                }
+                
+                initEventListeners() {
+                    this.domElement.addEventListener('mousedown', (e) => {
+                        this.isMouseDown = true;
+                        this.mouseX = e.clientX;
+                        this.mouseY = e.clientY;
+                    });
+                    
+                    this.domElement.addEventListener('mouseup', () => {
+                        this.isMouseDown = false;
+                    });
+                    
+                    this.domElement.addEventListener('mousemove', (e) => {
+                        if (this.isMouseDown && this.enableRotate) {
+                            const deltaX = e.clientX - this.mouseX;
+                            const deltaY = e.clientY - this.mouseY;
+                            
+                            this.camera.position.x = this.camera.position.x * Math.cos(deltaX * 0.01) - this.camera.position.z * Math.sin(deltaX * 0.01);
+                            this.camera.position.z = this.camera.position.x * Math.sin(deltaX * 0.01) + this.camera.position.z * Math.cos(deltaX * 0.01);
+                            this.camera.position.y += deltaY * 0.1;
+                            
+                            this.camera.lookAt(0, 0, 0);
+                            
+                            this.mouseX = e.clientX;
+                            this.mouseY = e.clientY;
+                        }
+                    });
+                    
+                    this.domElement.addEventListener('wheel', (e) => {
+                        if (this.enableZoom) {
+                            const scale = e.deltaY > 0 ? 1.1 : 0.9;
+                            this.camera.position.multiplyScalar(scale);
+                            e.preventDefault();
+                        }
+                    });
+                }
+                
+                update() {
+                    // Basic damping could be implemented here
+                }
+            };
+        }
+    </script>
+    
     <style>
         /* Custom animations and styles */
         .fade-in {
@@ -380,6 +448,125 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Trinomial Tree Animation -->
+                <div id="trinomialAnimation" class="algorithm-content" style="display: none;">
+                    <div class="bg-white rounded-lg p-6 shadow-sm">
+                        <h4 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                            <span class="text-3xl mr-3">🔷</span>
+                            Trinomial Tree Model (Boyle)
+                        </h4>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Tree Visualization -->
+                            <div>
+                                <div class="flex justify-between items-center mb-4">
+                                    <h5 class="text-lg font-semibold">Tree Evolution</h5>
+                                    <div class="flex gap-2">
+                                        <button onclick="animateTrinomialTree()" class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-semibold hover:bg-green-700">
+                                            ▶️ Animate
+                                        </button>
+                                        <button onclick="resetTrinomialAnimation()" class="px-4 py-2 bg-gray-600 text-white rounded-lg text-sm font-semibold hover:bg-gray-700">
+                                            🔄 Reset
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Controls -->
+                                <div class="mb-4 space-y-3">
+                                    <div class="flex items-center gap-4">
+                                        <label class="text-sm font-medium">Steps:</label>
+                                        <input type="range" id="trinomialSteps" min="2" max="4" value="3" class="flex-1">
+                                        <span id="trinomialStepsDisplay" class="text-sm font-mono">3</span>
+                                    </div>
+                                    <div class="flex items-center gap-4">
+                                        <label class="text-sm font-medium">Speed:</label>
+                                        <input type="range" id="trinomialSpeed" min="500" max="3000" value="1500" class="flex-1">
+                                        <span class="text-sm">Slow ↔ Fast</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Animation Canvas -->
+                                <div id="trinomialCanvas" class="bg-gray-50 rounded-lg min-h-64 border overflow-auto">
+                                    <div class="p-8 text-center text-gray-500">
+                                        <div class="text-4xl mb-4">🔷</div>
+                                        <p>Click "Animate" to see trinomial tree construction</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Educational Content -->
+                            <div class="space-y-4">
+                                <div class="bg-blue-50 p-4 rounded-lg">
+                                    <h5 class="font-semibold text-blue-800 mb-3">Trinomial vs Binomial</h5>
+                                    <div class="space-y-2 text-sm text-blue-700">
+                                        <div class="step-explanation">
+                                            <div class="flex items-start">
+                                                <span class="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-2 mt-0.5">🔺</span>
+                                                <div>
+                                                    <strong>Up Move:</strong> Price increases by factor u = <span class="font-mono">e^(σ√(2Δt))</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="step-explanation">
+                                            <div class="flex items-start">
+                                                <span class="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-2 mt-0.5">➡️</span>
+                                                <div>
+                                                    <strong>Middle Move:</strong> Price stays the same (unique to trinomial)
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="step-explanation">
+                                            <div class="flex items-start">
+                                                <span class="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-2 mt-0.5">🔻</span>
+                                                <div>
+                                                    <strong>Down Move:</strong> Price decreases by factor d = 1/u
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="step-explanation">
+                                            <div class="flex items-start">
+                                                <span class="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-2 mt-0.5">🎯</span>
+                                                <div>
+                                                    <strong>Better Accuracy:</strong> 16.4% more accurate than binomial trees
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Current Step Display -->
+                                <div class="bg-green-50 p-4 rounded-lg">
+                                    <h5 class="font-semibold text-green-800 mb-3">Current Step</h5>
+                                    <div id="trinomialStepDisplay" class="text-sm text-green-700">
+                                        Ready to begin trinomial tree animation...
+                                    </div>
+                                </div>
+                                
+                                <!-- Probability Formulas -->
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <h5 class="font-semibold text-gray-800 mb-3">Risk-Neutral Probabilities</h5>
+                                    <div class="text-sm space-y-2 font-mono">
+                                        <div><strong>p_u</strong> = ((e^(r·Δt) - d)(u - 1)) / ((u - d)(u - 1))</div>
+                                        <div><strong>p_m</strong> = 1 - p_u - p_d</div>
+                                        <div><strong>p_d</strong> = ((e^(r·Δt) - d)(1 - d)) / ((u - d)(1 - d))</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Advantages -->
+                                <div class="bg-purple-50 p-4 rounded-lg">
+                                    <h5 class="font-semibold text-purple-800 mb-3">🚀 Advantages</h5>
+                                    <ul class="text-sm text-purple-700 space-y-1">
+                                        <li>• <strong>Higher accuracy</strong> with fewer steps</li>
+                                        <li>• <strong>Stable convergence</strong> to analytical solutions</li>
+                                        <li>• <strong>Better for exotic options</strong> with barriers</li>
+                                        <li>• <strong>Recommended model</strong> for production use</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 
                 <!-- Monte Carlo Animation -->
                 <div id="montecarloAnimation" class="algorithm-content hidden">
@@ -533,6 +720,115 @@
                                     </ul>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3D Greeks Surface Plots Section -->
+        <section class="mb-16">
+            <div class="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-xl p-8">
+                <h3 class="text-3xl font-bold text-gray-800 mb-6 text-center">🌊 3D Greeks Surface Plots</h3>
+                <p class="text-gray-600 text-center mb-8">Visualize how Greeks change across stock price and time dimensions</p>
+                
+                <!-- 3D Controls -->
+                <div class="bg-white rounded-lg p-6 mb-6">
+                    <div class="grid md:grid-cols-4 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Greek to Visualize</label>
+                            <select id="greek3D" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="delta">Delta (Price Sensitivity)</option>
+                                <option value="gamma">Gamma (Delta Change)</option>
+                                <option value="theta">Theta (Time Decay)</option>
+                                <option value="vega">Vega (Volatility Sensitivity)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Base Stock Price ($)</label>
+                            <input type="number" id="base3DStock" value="100" min="10" max="500" step="5" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Strike Price ($)</label>
+                            <input type="number" id="strike3D" value="105" min="10" max="500" step="5" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Volatility (%)</label>
+                            <input type="number" id="vol3D" value="25" min="5" max="100" step="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-center space-x-4 mb-4">
+                        <button id="generate3D" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                            🎨 Generate 3D Surface
+                        </button>
+                        <button id="rotate3D" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                            🔄 Auto Rotate
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 3D Canvas Container -->
+                <div class="bg-white rounded-lg p-4 mb-6">
+                    <div id="threejs-container" class="w-full h-96 bg-gray-900 rounded-lg relative">
+                        <div id="loading3D" class="absolute inset-0 flex items-center justify-center text-white">
+                            <div class="text-center">
+                                <div class="animate-spin text-4xl mb-4">🌀</div>
+                                <p>Loading 3D visualization...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 3D Analysis Display -->
+                <div id="surface-analysis" class="grid md:grid-cols-3 gap-4 mb-6" style="display: none;">
+                    <div class="bg-white rounded-lg p-4 border">
+                        <h5 class="font-semibold text-gray-800 mb-2">Surface Statistics</h5>
+                        <div id="surface-stats" class="text-sm text-gray-600">
+                            <div class="mb-1">Max Value: <span id="max-value" class="font-mono text-blue-600">--</span></div>
+                            <div class="mb-1">Min Value: <span id="min-value" class="font-mono text-red-600">--</span></div>
+                            <div>Range: <span id="value-range" class="font-mono text-green-600">--</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg p-4 border">
+                        <h5 class="font-semibold text-gray-800 mb-2">Key Insights</h5>
+                        <div id="surface-insights" class="text-sm text-gray-600">
+                            <div id="insight-text">Click "Generate 3D Surface" to see insights</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg p-4 border">
+                        <h5 class="font-semibold text-gray-800 mb-2">Interactive Guide</h5>
+                        <div class="text-sm text-gray-600">
+                            <div class="mb-1">🖱️ <strong>Mouse:</strong> Rotate view</div>
+                            <div class="mb-1">🔍 <strong>Scroll:</strong> Zoom in/out</div>
+                            <div>🎯 <strong>Click:</strong> Reset view</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Educational Context -->
+                <div class="bg-blue-50 rounded-lg p-6">
+                    <h4 class="text-lg font-semibold text-blue-800 mb-3">🎓 Understanding 3D Greeks</h4>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <h5 class="font-medium text-blue-700 mb-2">What You're Seeing:</h5>
+                            <ul class="text-sm text-blue-600 space-y-1">
+                                <li>• <strong>X-Axis:</strong> Stock prices (around current price)</li>
+                                <li>• <strong>Y-Axis:</strong> Time to expiration (days)</li>
+                                <li>• <strong>Z-Axis (Height):</strong> Greek value</li>
+                                <li>• <strong>Colors:</strong> Heat map of values</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5 class="font-medium text-blue-700 mb-2">Key Patterns:</h5>
+                            <ul class="text-sm text-blue-600 space-y-1">
+                                <li>• <strong>Delta:</strong> Steeper near strike, flatter far away</li>
+                                <li>• <strong>Gamma:</strong> Peaks at-the-money, fades with time</li>
+                                <li>• <strong>Theta:</strong> Accelerates as expiration approaches</li>
+                                <li>• <strong>Vega:</strong> Highest with time, peaks at-the-money</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -1449,6 +1745,11 @@
                 document.getElementById('binomialStepsValue').textContent = this.value;
             });
             
+            // Trinomial tree input listeners
+            document.getElementById('trinomialSteps').addEventListener('input', function() {
+                document.getElementById('trinomialStepsDisplay').textContent = this.value;
+            });
+            
             document.getElementById('mcPaths').addEventListener('input', function() {
                 document.getElementById('mcPathsValue').textContent = parseInt(this.value).toLocaleString();
             });
@@ -1462,7 +1763,10 @@
         function showAlgorithm(algorithm) {
             // Hide all algorithm content
             const contents = document.querySelectorAll('.algorithm-content');
-            contents.forEach(content => content.classList.add('hidden'));
+            contents.forEach(content => {
+                content.classList.add('hidden');
+                content.style.display = 'none';
+            });
             
             // Reset button styles
             const buttons = ['binomialBtn', 'trinomialBtn', 'blackscholesBtn', 'montecarloBtn'];
@@ -1472,7 +1776,11 @@
             });
             
             // Show selected algorithm
-            document.getElementById(algorithm + 'Animation').classList.remove('hidden');
+            const targetElement = document.getElementById(algorithm + 'Animation');
+            if (targetElement) {
+                targetElement.classList.remove('hidden');
+                targetElement.style.display = 'block';
+            }
             
             // Highlight selected button
             const selectedBtn = document.getElementById(algorithm + 'Btn');
@@ -1545,6 +1853,176 @@
             }
             
             nextStep();
+        }
+
+        // Trinomial Tree Animation
+        function animateTrinomialTree() {
+            const steps = parseInt(document.getElementById('trinomialSteps').value);
+            const speed = parseInt(document.getElementById('trinomialSpeed').value);
+            const canvas = document.getElementById('trinomialCanvas');
+            const stepDisplay = document.getElementById('trinomialStepDisplay');
+            
+            // Update steps display
+            document.getElementById('trinomialStepsDisplay').textContent = steps;
+            
+            // Clear canvas
+            canvas.innerHTML = '<div class="p-4"><div class="text-center text-lg font-bold mb-4">🔷 Building Trinomial Tree...</div></div>';
+            
+            let currentStep = 0;
+            const totalSteps = 5; // More steps for trinomial explanation
+            
+            function nextStep() {
+                switch (currentStep) {
+                    case 0:
+                        stepDisplay.textContent = 'Step 1: Initialize root node with current stock price';
+                        canvas.innerHTML = createTrinomialVisualization(1, steps);
+                        break;
+                    case 1:
+                        stepDisplay.textContent = 'Step 2: Calculate up, middle, and down factors (u, m=1, d)';
+                        canvas.innerHTML = createTrinomialVisualization(2, steps);
+                        break;
+                    case 2:
+                        stepDisplay.textContent = 'Step 3: Calculate risk-neutral probabilities (p_u, p_m, p_d)';
+                        canvas.innerHTML = createTrinomialVisualization(3, steps);
+                        break;
+                    case 3:
+                        stepDisplay.textContent = 'Step 4: Build complete tree forward to expiration';
+                        canvas.innerHTML = createTrinomialVisualization(4, steps);
+                        break;
+                    case 4:
+                        stepDisplay.textContent = 'Step 5: Work backwards calculating option values using trinomial recombination';
+                        canvas.innerHTML = createTrinomialVisualization(5, steps);
+                        break;
+                }
+                
+                currentStep++;
+                if (currentStep <= totalSteps) {
+                    setTimeout(nextStep, speed);
+                }
+            }
+            
+            nextStep();
+        }
+        
+        function createTrinomialVisualization(step, maxSteps) {
+            const S0 = 100; // Current stock price
+            const u = 1.22; // Up factor (higher than binomial)
+            const d = 1/u; // Down factor
+            const m = 1.0; // Middle factor (stays same)
+            
+            let html = '<div class="p-4">';
+            html += '<div class="text-center mb-4"><h6 class="font-bold text-lg">Trinomial Tree Construction</h6></div>';
+            
+            if (step >= 1) {
+                // Root node
+                html += '<div class="flex justify-center mb-4">';
+                html += `<div class="bg-blue-100 border-2 border-blue-500 rounded-lg p-2 text-center">`;
+                html += `<div class="font-bold">S₀</div><div class="text-sm">$${S0}</div>`;
+                html += '</div></div>';
+                
+                if (step >= 2) {
+                    // First level (showing three branches)
+                    html += '<div class="flex justify-center space-x-8 mb-4">';
+                    
+                    // Up node
+                    html += `<div class="text-center">`;
+                    html += `<div class="bg-green-100 border-2 border-green-500 rounded-lg p-2">`;
+                    html += `<div class="font-bold">Su</div><div class="text-sm">$${(S0 * u).toFixed(1)}</div>`;
+                    html += `<div class="text-xs text-green-700">×${u.toFixed(2)}</div>`;
+                    html += '</div></div>';
+                    
+                    // Middle node (unique to trinomial)
+                    html += `<div class="text-center">`;
+                    html += `<div class="bg-yellow-100 border-2 border-yellow-500 rounded-lg p-2">`;
+                    html += `<div class="font-bold">Sm</div><div class="text-sm">$${(S0 * m).toFixed(1)}</div>`;
+                    html += `<div class="text-xs text-yellow-700">×${m.toFixed(2)}</div>`;
+                    html += '</div></div>';
+                    
+                    // Down node
+                    html += `<div class="text-center">`;
+                    html += `<div class="bg-red-100 border-2 border-red-500 rounded-lg p-2">`;
+                    html += `<div class="font-bold">Sd</div><div class="text-sm">$${(S0 * d).toFixed(1)}</div>`;
+                    html += `<div class="text-xs text-red-700">×${d.toFixed(2)}</div>`;
+                    html += '</div></div>';
+                    
+                    html += '</div>';
+                    
+                    if (step >= 3) {
+                        // Add probability explanations
+                        html += '<div class="bg-gray-50 rounded-lg p-3 mt-4 text-center">';
+                        html += '<div class="text-sm font-semibold mb-2">Risk-Neutral Probabilities:</div>';
+                        html += '<div class="grid grid-cols-3 gap-4 text-xs">';
+                        html += '<div class="text-green-700"><strong>p_u = 0.25</strong><br>Up probability</div>';
+                        html += '<div class="text-yellow-700"><strong>p_m = 0.50</strong><br>Middle probability</div>';
+                        html += '<div class="text-red-700"><strong>p_d = 0.25</strong><br>Down probability</div>';
+                        html += '</div>';
+                        html += '<div class="text-xs text-gray-600 mt-2">p_u + p_m + p_d = 1.0 ✓</div>';
+                        html += '</div>';
+                        
+                        if (step >= 4) {
+                            // Show next level to demonstrate recombination
+                            html += '<div class="mt-6">';
+                            html += '<div class="text-center text-sm font-semibold mb-3">Next Time Step (Recombining Tree):</div>';
+                            html += '<div class="flex justify-center space-x-4">';
+                            
+                            const prices = [
+                                S0 * u * u,
+                                S0 * u * m,
+                                S0 * u * d, // Same as S0 * m * u (recombining!)
+                                S0 * m * d,
+                                S0 * d * d
+                            ];
+                            
+                            prices.forEach((price, i) => {
+                                let colorClass = '';
+                                if (i === 0) {
+                                    colorClass = 'bg-green-50 border-green-300';
+                                } else if (i === prices.length - 1) {
+                                    colorClass = 'bg-red-50 border-red-300';
+                                } else {
+                                    colorClass = 'bg-blue-50 border-blue-300';
+                                }
+                                html += '<div class="' + colorClass + ' border rounded p-1 text-xs text-center">';
+                                html += '$' + price.toFixed(1);
+                                html += '</div>';
+                            });
+                            
+                            html += '</div>';
+                            html += '<div class="text-xs text-center text-gray-600 mt-2">Notice: Su*d = Sm*u (recombining tree structure)</div>';
+                            html += '</div>';
+                            
+                            if (step >= 5) {
+                                // Show option valuation
+                                html += '<div class="mt-4 bg-purple-50 rounded-lg p-3">';
+                                html += '<div class="text-sm font-semibold text-purple-800 mb-2">🔄 Working Backwards:</div>';
+                                html += '<div class="text-xs text-purple-700 space-y-1">';
+                                html += '<div>1. Start at expiration: Option value = max(S-K, 0) for calls</div>';
+                                html += '<div>2. At each earlier node: V = e^(-r×Δt) × (p_u×V_u + p_m×V_m + p_d×V_d)</div>';
+                                html += '<div>3. Continue until reaching root node</div>';
+                                html += '<div class="font-semibold text-green-700">Result: More accurate than binomial (3 branches vs 2)</div>';
+                                html += '</div>';
+                                html += '</div>';
+                            }
+                        }
+                    }
+                }
+            }
+            
+            html += '</div>';
+            return html;
+        }
+        
+        function resetTrinomialAnimation() {
+            const canvas = document.getElementById('trinomialCanvas');
+            const stepDisplay = document.getElementById('trinomialStepDisplay');
+            
+            canvas.innerHTML = `
+                <div class="p-8 text-center text-gray-500">
+                    <div class="text-4xl mb-4">🔷</div>
+                    <p>Click "Animate" to see trinomial tree construction</p>
+                </div>
+            `;
+            stepDisplay.textContent = 'Ready to begin trinomial tree animation...';
         }
         
         function createTreeVisualization(step, totalSteps) {
@@ -1835,6 +2313,290 @@
             
             nextStep();
         }
+
+        // ============================================================================
+        // 3D GREEKS SURFACE PLOTS IMPLEMENTATION
+        // ============================================================================
+
+        let scene, camera, renderer, surfaceMesh, controls;
+        let animationFrame;
+        let isRotating = false;
+
+        function initialize3DVisualization() {
+            const container = document.getElementById('threejs-container');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            // Scene setup
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1a1a2e);
+
+            // Camera setup
+            camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+            camera.position.set(15, 15, 15);
+            camera.lookAt(0, 0, 0);
+
+            // Renderer setup
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(width, height);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+            // Clear container and add renderer
+            container.innerHTML = '';
+            container.appendChild(renderer.domElement);
+
+            // Controls setup (OrbitControls)
+            if (typeof THREE.OrbitControls !== 'undefined') {
+                controls = new THREE.OrbitControls(camera, renderer.domElement);
+                controls.enableDamping = true;
+                controls.dampingFactor = 0.05;
+                controls.enableZoom = true;
+                controls.enableRotate = true;
+                controls.enablePan = true;
+            }
+
+            // Lighting setup
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(10, 10, 5);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+
+            const pointLight = new THREE.PointLight(0x00ffff, 0.5);
+            pointLight.position.set(-10, 10, -5);
+            scene.add(pointLight);
+
+            // Add grid helper
+            const gridHelper = new THREE.GridHelper(20, 20, 0x666666, 0x444444);
+            gridHelper.position.y = -5;
+            scene.add(gridHelper);
+
+            // Add axis helpers
+            const axesHelper = new THREE.AxesHelper(10);
+            scene.add(axesHelper);
+
+            // Start animation loop
+            animate3D();
+
+            console.log('3D Visualization initialized successfully');
+        }
+
+        function generate3DSurface() {
+            const greekType = document.getElementById('greek3D').value;
+            const baseStock = parseFloat(document.getElementById('base3DStock').value);
+            const strike = parseFloat(document.getElementById('strike3D').value);
+            const volatility = parseFloat(document.getElementById('vol3D').value) / 100;
+
+            // Remove existing surface
+            if (surfaceMesh) {
+                scene.remove(surfaceMesh);
+            }
+
+            // Generate surface data
+            const resolution = 30;
+            const stockRange = baseStock * 0.4; // ±40% range
+            const timeRange = 90; // 0-90 days
+
+            const geometry = new THREE.PlaneGeometry(20, 20, resolution - 1, resolution - 1);
+            const vertices = geometry.attributes.position.array;
+            const colors = [];
+
+            let minValue = Infinity;
+            let maxValue = -Infinity;
+
+            // Calculate Greeks for each point
+            for (let i = 0; i < resolution; i++) {
+                for (let j = 0; j < resolution; j++) {
+                    const stockPrice = baseStock + (stockRange * 2 * (i / (resolution - 1)) - stockRange);
+                    const timeToExpiry = (timeRange * (j / (resolution - 1)) + 1) / 365; // 1-90 days
+                    
+                    // Calculate Greek value using our pricing library
+                    try {
+                        const greeks = pricingLibrary.calculateGreeks({
+                            stockPrice: stockPrice,
+                            strikePrice: strike,
+                            timeToExpiry: timeToExpiry,
+                            riskFreeRate: 0.04,
+                            volatility: volatility,
+                            dividendYield: 0.015,
+                            optionType: 'call',
+                            exerciseStyle: 'american'
+                        });
+
+                        let value = 0;
+                        switch (greekType) {
+                            case 'delta':
+                                value = greeks.delta;
+                                break;
+                            case 'gamma':
+                                value = greeks.gamma;
+                                break;
+                            case 'theta':
+                                value = greeks.theta * 365; // Convert to per-year for better scaling
+                                break;
+                            case 'vega':
+                                value = greeks.vega * 100; // Convert to per-vol-point for better scaling
+                                break;
+                        }
+
+                        const index = (i * resolution + j) * 3;
+                        vertices[index + 2] = value * 3; // Scale Z for visibility
+
+                        minValue = Math.min(minValue, value);
+                        maxValue = Math.max(maxValue, value);
+
+                        // Color based on value (heat map)
+                        const normalizedValue = (value - minValue) / (maxValue - minValue) || 0;
+                        const color = new THREE.Color();
+                        color.setHSL(0.7 * (1 - normalizedValue), 0.8, 0.5); // Blue to Red gradient
+                        colors.push(color.r, color.g, color.b);
+
+                    } catch (error) {
+                        console.warn('Error calculating Greeks:', error);
+                        const index = (i * resolution + j) * 3;
+                        vertices[index + 2] = 0;
+                        colors.push(0.5, 0.5, 0.5); // Gray for errors
+                    }
+                }
+            }
+
+            geometry.attributes.position.needsUpdate = true;
+            geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+            // Create surface material
+            const material = new THREE.MeshLambertMaterial({
+                vertexColors: true,
+                side: THREE.DoubleSide,
+                wireframe: false
+            });
+
+            // Create mesh
+            surfaceMesh = new THREE.Mesh(geometry, material);
+            surfaceMesh.rotation.x = -Math.PI / 2; // Rotate to make it horizontal
+            surfaceMesh.castShadow = true;
+            surfaceMesh.receiveShadow = true;
+
+            scene.add(surfaceMesh);
+
+            // Update analysis display
+            updateSurfaceAnalysis(greekType, minValue, maxValue, baseStock, strike, volatility * 100);
+
+            // Show analysis section
+            document.getElementById('surface-analysis').style.display = 'grid';
+            
+            console.log(`3D ${greekType} surface generated with range: ${minValue.toFixed(4)} to ${maxValue.toFixed(4)}`);
+        }
+
+        function updateSurfaceAnalysis(greekType, minValue, maxValue, stockPrice, strike, volatility) {
+            // Update statistics
+            document.getElementById('max-value').textContent = maxValue.toFixed(4);
+            document.getElementById('min-value').textContent = minValue.toFixed(4);
+            document.getElementById('value-range').textContent = (maxValue - minValue).toFixed(4);
+
+            // Generate insights based on Greek type
+            const insightText = document.getElementById('insight-text');
+            let insights = '';
+
+            switch (greekType) {
+                case 'delta':
+                    insights = `
+                        <div class="mb-2"><strong>Delta Surface Analysis:</strong></div>
+                        <div class="text-xs space-y-1">
+                            <div>• Peak at strike price ($${strike})</div>
+                            <div>• Call delta: 0 (far OTM) → 1 (far ITM)</div>
+                            <div>• Steepest slope around at-the-money</div>
+                            <div>• Less time sensitivity for far ITM/OTM</div>
+                        </div>
+                    `;
+                    break;
+                case 'gamma':
+                    insights = `
+                        <div class="mb-2"><strong>Gamma Surface Analysis:</strong></div>
+                        <div class="text-xs space-y-1">
+                            <div>• Highest at-the-money (strike: $${strike})</div>
+                            <div>• Decreases rapidly away from strike</div>
+                            <div>• Increases as expiration approaches</div>
+                            <div>• Near zero for far ITM/OTM options</div>
+                        </div>
+                    `;
+                    break;
+                case 'theta':
+                    insights = `
+                        <div class="mb-2"><strong>Theta Surface Analysis:</strong></div>
+                        <div class="text-xs space-y-1">
+                            <div>• Most negative (decay) at-the-money</div>
+                            <div>• Accelerates as expiration approaches</div>
+                            <div>• Lower time decay for far ITM/OTM</div>
+                            <div>• Time decay is option holder's enemy</div>
+                        </div>
+                    `;
+                    break;
+                case 'vega':
+                    insights = `
+                        <div class="mb-2"><strong>Vega Surface Analysis:</strong></div>
+                        <div class="text-xs space-y-1">
+                            <div>• Highest at-the-money (strike: $${strike})</div>
+                            <div>• Increases with more time to expiry</div>
+                            <div>• Near zero for far ITM/OTM options</div>
+                            <div>• Volatility=${volatility}% impacts premium</div>
+                        </div>
+                    `;
+                    break;
+            }
+
+            insightText.innerHTML = insights;
+        }
+
+        function animate3D() {
+            animationFrame = requestAnimationFrame(animate3D);
+
+            if (controls) {
+                controls.update();
+            }
+
+            if (isRotating && surfaceMesh) {
+                surfaceMesh.rotation.z += 0.005;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        function toggle3DRotation() {
+            isRotating = !isRotating;
+            const button = document.getElementById('rotate3D');
+            button.textContent = isRotating ? '⏸️ Stop Rotation' : '🔄 Auto Rotate';
+        }
+
+        // Event listeners for 3D functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize 3D scene when the page loads
+            setTimeout(initialize3DVisualization, 500);
+
+            // Event listeners
+            document.getElementById('generate3D').addEventListener('click', generate3DSurface);
+            document.getElementById('rotate3D').addEventListener('click', toggle3DRotation);
+
+            // Auto-generate initial surface
+            setTimeout(() => {
+                generate3DSurface();
+            }, 1000);
+
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (camera && renderer) {
+                    const container = document.getElementById('threejs-container');
+                    const width = container.clientWidth;
+                    const height = container.clientHeight;
+
+                    camera.aspect = width / height;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(width, height);
+                }
+            });
+        });
     </script>
 </body>
 </html>
