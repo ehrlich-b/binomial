@@ -152,15 +152,93 @@
                     </div>
                     <div>
                         <h4 class="text-xl font-semibold mb-4">Greeks Chart</h4>
-                        <div class="text-gray-600">Chart temporarily disabled - will fix canvas resize issue</div>
+                        <div class="relative w-full" style="height: 400px;">
+                            <canvas id="greeksChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Greeks Education Section -->
+        <section id="learn" class="mb-16">
+            <h3 class="text-3xl font-bold mb-8 text-center">Understanding the Greeks</h3>
+            
+            <!-- Common Misconception Alert -->
+            <div class="bg-amber-50 border-l-4 border-amber-400 p-6 mb-8">
+                <div class="flex">
+                    <div class="text-amber-400 text-2xl mr-3">⚠️</div>
+                    <div>
+                        <h4 class="text-lg font-semibold text-amber-800 mb-2">Common Confusion: Rho ≠ Risk-Free Rate</h4>
+                        <p class="text-amber-700">The risk-free rate is the actual interest rate (like 4%). <strong>Rho</strong> is how much your option price <em>changes</em> when that rate moves by 1%.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+                <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
+                    <h5 class="font-bold text-blue-800 mb-2">Delta (Δ)</h5>
+                    <p class="text-sm text-blue-700 mb-2">Speed of price change</p>
+                    <p class="text-xs text-gray-600">If stock moves $1, option moves ~$Delta. Call: 0-1, Put: -1-0</p>
+                </div>
+                
+                <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-400">
+                    <h5 class="font-bold text-green-800 mb-2">Gamma (Γ)</h5>
+                    <p class="text-sm text-green-700 mb-2">Acceleration</p>
+                    <p class="text-xs text-gray-600">How much Delta changes per $1 stock move. Higher = more responsive</p>
+                </div>
+                
+                <div class="bg-red-50 p-4 rounded-lg border-l-4 border-red-400">
+                    <h5 class="font-bold text-red-800 mb-2">Theta (Θ)</h5>
+                    <p class="text-sm text-red-700 mb-2">Time decay</p>
+                    <p class="text-xs text-gray-600">$ lost per day. Always negative - time kills options</p>
+                </div>
+                
+                <div class="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-400">
+                    <h5 class="font-bold text-purple-800 mb-2">Vega (V)</h5>
+                    <p class="text-sm text-purple-700 mb-2">Volatility sensitivity</p>
+                    <p class="text-xs text-gray-600">$ change per 1% volatility move (25% → 26%)</p>
+                </div>
+                
+                <div class="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-400">
+                    <h5 class="font-bold text-yellow-800 mb-2">Rho (ρ)</h5>
+                    <p class="text-sm text-yellow-700 mb-2">Rate sensitivity</p>
+                    <p class="text-xs text-gray-600">$ change per 1% rate move (4% → 5%). Call: +, Put: -</p>
+                </div>
+            </div>
+
+            <!-- Interactive Examples -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h4 class="text-xl font-semibold mb-4">Real-World Example</h4>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h5 class="font-medium mb-3">📱 AAPL $150 Call, $155 Strike, 30 days</h5>
+                        <div class="space-y-2 text-sm">
+                            <div><strong>Delta = 0.35:</strong> If AAPL rises $1 → Call gains ~$0.35</div>
+                            <div><strong>Gamma = 0.02:</strong> That 0.35 delta becomes ~0.37</div>
+                            <div><strong>Theta = -0.08:</strong> Loses $0.08 every day that passes</div>
+                            <div><strong>Vega = 0.12:</strong> If volatility rises 1% → Call gains $0.12</div>
+                            <div><strong>Rho = 0.27:</strong> If rates rise from 4%→5% → Call gains $0.27</div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h5 class="font-medium mb-3">🎯 Key Insights</h5>
+                        <ul class="text-sm space-y-1 text-gray-700">
+                            <li>• <strong>All Greeks are rates of change</strong> (derivatives)</li>
+                            <li>• Delta shows directional exposure</li>
+                            <li>• Gamma shows how fast that changes</li>
+                            <li>• Theta is your daily bleed</li>
+                            <li>• Vega matters most for earnings/events</li>
+                            <li>• Rho barely matters unless rates are moving fast</li>
+                        </ul>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Features Section -->
-        <section id="learn" class="mb-16">
-            <h3 class="text-3xl font-bold mb-8 text-center">Features</h3>
+        <section class="mb-16">
+            <h3 class="text-3xl font-bold mb-8 text-center">Calculator Features</h3>
             <div class="grid md:grid-cols-3 gap-6">
                 <div class="bg-white rounded-xl shadow-lg p-6">
                     <div class="text-blue-600 text-3xl mb-4">📊</div>
@@ -182,8 +260,85 @@
             </div>
         </section>
 
-        <!-- About Section -->
+        <!-- Payoff Diagram Builder Section -->
         <section id="playground" class="mb-16">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <h3 class="text-3xl font-bold mb-8 text-center">Strategy Builder & Payoff Diagrams</h3>
+                
+                <!-- Strategy Builder Controls -->
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <div>
+                        <h4 class="text-xl font-semibold mb-4">Build Your Strategy</h4>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Strategy Type</label>
+                                <select id="strategyType" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="single">Single Option</option>
+                                    <option value="covered-call">Covered Call</option>
+                                    <option value="protective-put">Protective Put</option>
+                                    <option value="straddle">Long Straddle</option>
+                                    <option value="strangle">Long Strangle</option>
+                                    <option value="butterfly">Butterfly Spread</option>
+                                    <option value="custom">Custom Multi-Leg</option>
+                                </select>
+                            </div>
+                            
+                            <div id="strategyParams" class="space-y-3">
+                                <!-- Strategy parameters will be populated here -->
+                            </div>
+                            
+                            <button onclick="buildPayoffDiagram()" class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors">
+                                Generate Payoff Diagram
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-xl font-semibold mb-4">Payoff Chart</h4>
+                        <div class="relative w-full bg-gray-50 rounded-lg" style="height: 300px;">
+                            <canvas id="payoffChart"></canvas>
+                        </div>
+                        
+                        <div id="strategyMetrics" class="mt-4 space-y-2">
+                            <!-- Strategy metrics will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Predefined Strategy Examples -->
+                <div class="border-t pt-6">
+                    <h4 class="text-lg font-semibold mb-4">Popular Strategies</h4>
+                    <div class="grid md:grid-cols-4 gap-4">
+                        <button onclick="loadStrategy('covered-call')" class="bg-blue-50 hover:bg-blue-100 p-4 rounded-lg text-left transition-colors">
+                            <h5 class="font-medium text-blue-800">Covered Call</h5>
+                            <p class="text-xs text-gray-600 mt-1">Own stock + sell call</p>
+                            <p class="text-xs text-blue-600 mt-1">📈 Neutral/Bullish</p>
+                        </button>
+                        
+                        <button onclick="loadStrategy('protective-put')" class="bg-green-50 hover:bg-green-100 p-4 rounded-lg text-left transition-colors">
+                            <h5 class="font-medium text-green-800">Protective Put</h5>
+                            <p class="text-xs text-gray-600 mt-1">Own stock + buy put</p>
+                            <p class="text-xs text-green-600 mt-1">📈 Bullish protection</p>
+                        </button>
+                        
+                        <button onclick="loadStrategy('straddle')" class="bg-purple-50 hover:bg-purple-100 p-4 rounded-lg text-left transition-colors">
+                            <h5 class="font-medium text-purple-800">Long Straddle</h5>
+                            <p class="text-xs text-gray-600 mt-1">Buy call + put same strike</p>
+                            <p class="text-xs text-purple-600 mt-1">⚡ High volatility play</p>
+                        </button>
+                        
+                        <button onclick="loadStrategy('iron-condor')" class="bg-yellow-50 hover:bg-yellow-100 p-4 rounded-lg text-left transition-colors">
+                            <h5 class="font-medium text-yellow-800">Iron Condor</h5>
+                            <p class="text-xs text-gray-600 mt-1">4-leg neutral strategy</p>
+                            <p class="text-xs text-yellow-600 mt-1">😴 Low volatility play</p>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="mb-16">
             <div class="bg-white rounded-xl shadow-lg p-8">
                 <h3 class="text-3xl font-bold mb-8 text-center">About</h3>
                 <div class="text-center">
@@ -262,8 +417,8 @@
                 console.log('🚀 Pricing library loaded successfully');
                 console.log('📊 Loaded modules:', Object.keys(module));
                 
-                // Skip chart initialization - causing infinite loops
-                // initializeGreeksChart();
+                // Initialize Greeks chart with fixed responsive settings
+                initializeGreeksChart();
                 
             } catch (error) {
                 console.error('❌ Failed to load pricing library:', error);
@@ -277,7 +432,60 @@
             }
         });
 
-        // Chart functions removed - causing infinite canvas growth
+        // Initialize Greeks radar chart with proper responsive settings
+        function initializeGreeksChart() {
+            const ctx = document.getElementById('greeksChart').getContext('2d');
+            
+            greeksChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Delta', 'Gamma', 'Theta', 'Vega', 'Rho'],
+                    datasets: [{
+                        label: 'Greeks Values',
+                        data: [0, 0, 0, 0, 0],
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: {
+                                display: true,
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            grid: {
+                                circular: true,
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            pointLabels: {
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                }
+                            },
+                            ticks: {
+                                display: false
+                            },
+                            min: -1,
+                            max: 1
+                        }
+                    }
+                }
+            });
+        }
 
         // Calculator functionality - with safety checks
         window.calculateOption = function() {
@@ -323,6 +531,7 @@
                 
                 displayResults(price, greeks, params);
                 updateGreeksDisplay(greeks);
+                updateGreeksChart(greeks);
                 
             } catch (error) {
                 console.error('Calculation error:', error);
@@ -371,37 +580,42 @@
             const greeksHtml = `
                 <div class="space-y-3">
                     <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
-                        <div>
+                        <div class="flex-1">
                             <span class="font-medium">Delta</span>
-                            <div class="text-xs text-gray-600">Price sensitivity</div>
+                            <div class="text-xs text-gray-600">Price change per $1 stock move</div>
+                            <div class="text-xs text-blue-700 mt-1">≈ ${((greeks.delta || 0) * 100).toFixed(1)}% of stock moves</div>
                         </div>
                         <span class="font-bold text-blue-600">${greeks.delta?.toFixed(4) || 'N/A'}</span>
                     </div>
                     <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                        <div>
+                        <div class="flex-1">
                             <span class="font-medium">Gamma</span>
-                            <div class="text-xs text-gray-600">Delta sensitivity</div>
+                            <div class="text-xs text-gray-600">Delta change per $1 stock move</div>
+                            <div class="text-xs text-green-700 mt-1">Higher = more delta acceleration</div>
                         </div>
                         <span class="font-bold text-green-600">${greeks.gamma?.toFixed(4) || 'N/A'}</span>
                     </div>
                     <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg">
-                        <div>
+                        <div class="flex-1">
                             <span class="font-medium">Theta</span>
-                            <div class="text-xs text-gray-600">Time decay (per day)</div>
+                            <div class="text-xs text-gray-600">Price decay per day</div>
+                            <div class="text-xs text-red-700 mt-1">Time is your enemy: $${((greeks.theta || 0) * -1).toFixed(2)}/day lost</div>
                         </div>
                         <span class="font-bold text-red-600">${greeks.theta?.toFixed(4) || 'N/A'}</span>
                     </div>
                     <div class="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
-                        <div>
+                        <div class="flex-1">
                             <span class="font-medium">Vega</span>
-                            <div class="text-xs text-gray-600">Volatility sensitivity</div>
+                            <div class="text-xs text-gray-600">Price change per 1% volatility</div>
+                            <div class="text-xs text-purple-700 mt-1">Vol from ${((greeks.vega || 0) > 0 ? '24% → 25%' : '25% → 24%')} = $${Math.abs(greeks.vega || 0).toFixed(2)}</div>
                         </div>
                         <span class="font-bold text-purple-600">${greeks.vega?.toFixed(4) || 'N/A'}</span>
                     </div>
                     <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
-                        <div>
+                        <div class="flex-1">
                             <span class="font-medium">Rho</span>
-                            <div class="text-xs text-gray-600">Interest rate sensitivity</div>
+                            <div class="text-xs text-gray-600">Price change per 1% rate change</div>
+                            <div class="text-xs text-yellow-700 mt-1">Rates 4% → 5% = $${(greeks.rho || 0).toFixed(2)} change</div>
                         </div>
                         <span class="font-bold text-yellow-600">${greeks.rho?.toFixed(4) || 'N/A'}</span>
                     </div>
@@ -459,6 +673,291 @@
                 timeout = setTimeout(later, wait);
             };
         }
+
+        // Payoff Diagram Builder Functions
+        let payoffChart;
+        let currentStrategy = {};
+
+        // Initialize payoff chart
+        function initializePayoffChart() {
+            const ctx = document.getElementById('payoffChart').getContext('2d');
+            
+            payoffChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: []
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Strategy Payoff at Expiration'
+                        },
+                        legend: {
+                            display: true
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Stock Price at Expiration ($)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Profit/Loss ($)'
+                            },
+                            grid: {
+                                color: function(context) {
+                                    return context.tick.value === 0 ? 'rgba(0, 0, 0, 0.3)' : 'rgba(0, 0, 0, 0.1)';
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+        }
+
+        // Load predefined strategy
+        window.loadStrategy = function(strategyType) {
+            document.getElementById('strategyType').value = strategyType;
+            populateStrategyParams(strategyType);
+            buildPayoffDiagram();
+        };
+
+        // Populate strategy parameters based on selected strategy
+        function populateStrategyParams(strategyType) {
+            const paramsContainer = document.getElementById('strategyParams');
+            const stockPrice = parseFloat(document.getElementById('stockPrice').value) || 150;
+            
+            let paramsHtml = '';
+            
+            switch (strategyType) {
+                case 'single':
+                    paramsHtml = `
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Position</label>
+                            <select id="position" class="w-full px-2 py-1 border rounded">
+                                <option value="long-call">Long Call</option>
+                                <option value="short-call">Short Call</option>
+                                <option value="long-put">Long Put</option>
+                                <option value="short-put">Short Put</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Strike Price</label>
+                            <input type="number" id="strike1" value="${stockPrice + 5}" step="1" class="w-full px-2 py-1 border rounded">
+                        </div>
+                    `;
+                    break;
+                    
+                case 'covered-call':
+                    paramsHtml = `
+                        <div class="text-sm text-gray-600 mb-2">Own 100 shares + Sell 1 call</div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Call Strike</label>
+                            <input type="number" id="callStrike" value="${stockPrice + 10}" step="1" class="w-full px-2 py-1 border rounded">
+                        </div>
+                    `;
+                    break;
+                    
+                case 'protective-put':
+                    paramsHtml = `
+                        <div class="text-sm text-gray-600 mb-2">Own 100 shares + Buy 1 put</div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Put Strike</label>
+                            <input type="number" id="putStrike" value="${stockPrice - 10}" step="1" class="w-full px-2 py-1 border rounded">
+                        </div>
+                    `;
+                    break;
+                    
+                case 'straddle':
+                    paramsHtml = `
+                        <div class="text-sm text-gray-600 mb-2">Buy call + Buy put (same strike)</div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Strike Price</label>
+                            <input type="number" id="straddleStrike" value="${stockPrice}" step="1" class="w-full px-2 py-1 border rounded">
+                        </div>
+                    `;
+                    break;
+                    
+                case 'strangle':
+                    paramsHtml = `
+                        <div class="text-sm text-gray-600 mb-2">Buy call + Buy put (different strikes)</div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Put Strike</label>
+                            <input type="number" id="putStrike" value="${stockPrice - 10}" step="1" class="w-full px-2 py-1 border rounded">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Call Strike</label>
+                            <input type="number" id="callStrike" value="${stockPrice + 10}" step="1" class="w-full px-2 py-1 border rounded">
+                        </div>
+                    `;
+                    break;
+            }
+            
+            paramsContainer.innerHTML = paramsHtml;
+        }
+
+        // Build and display payoff diagram
+        window.buildPayoffDiagram = function() {
+            if (!pricingLibrary) {
+                console.error('Pricing library not loaded');
+                return;
+            }
+
+            const strategyType = document.getElementById('strategyType').value;
+            const stockPrice = parseFloat(document.getElementById('stockPrice').value) || 150;
+            const volatility = parseFloat(document.getElementById('volatility').value) / 100 || 0.25;
+            const daysToExpiry = parseInt(document.getElementById('daysToExpiry').value) || 30;
+            
+            // Generate stock price range for payoff calculation
+            const minPrice = stockPrice * 0.7;
+            const maxPrice = stockPrice * 1.3;
+            const priceStep = (maxPrice - minPrice) / 50;
+            const stockPrices = [];
+            const payoffs = [];
+            
+            for (let price = minPrice; price <= maxPrice; price += priceStep) {
+                stockPrices.push(price);
+                payoffs.push(calculateStrategyPayoff(strategyType, price, stockPrice, volatility, daysToExpiry));
+            }
+            
+            // Update chart
+            payoffChart.data.labels = stockPrices.map(p => p.toFixed(0));
+            payoffChart.data.datasets = [{
+                label: getStrategyName(strategyType),
+                data: payoffs,
+                borderColor: 'rgb(147, 51, 234)',
+                backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                borderWidth: 2,
+                fill: true
+            }];
+            
+            payoffChart.update();
+            
+            // Update strategy metrics
+            updateStrategyMetrics(strategyType, payoffs, stockPrices, stockPrice);
+        };
+
+        function calculateStrategyPayoff(strategyType, currentPrice, stockPrice, volatility, daysToExpiry) {
+            const timeToExpiry = daysToExpiry / 365;
+            
+            switch (strategyType) {
+                case 'single':
+                    const position = document.getElementById('position')?.value || 'long-call';
+                    const strike = parseFloat(document.getElementById('strike1')?.value) || stockPrice + 5;
+                    
+                    if (position === 'long-call') {
+                        return Math.max(0, currentPrice - strike);
+                    } else if (position === 'short-call') {
+                        return -Math.max(0, currentPrice - strike);
+                    } else if (position === 'long-put') {
+                        return Math.max(0, strike - currentPrice);
+                    } else if (position === 'short-put') {
+                        return -Math.max(0, strike - currentPrice);
+                    }
+                    break;
+                    
+                case 'covered-call':
+                    const callStrike = parseFloat(document.getElementById('callStrike')?.value) || stockPrice + 10;
+                    const stockProfit = currentPrice - stockPrice;
+                    const callPayoff = -Math.max(0, currentPrice - callStrike);
+                    return stockProfit + callPayoff;
+                    
+                case 'protective-put':
+                    const putStrike = parseFloat(document.getElementById('putStrike')?.value) || stockPrice - 10;
+                    const stockProfitPP = currentPrice - stockPrice;
+                    const putPayoff = Math.max(0, putStrike - currentPrice);
+                    return stockProfitPP + putPayoff;
+                    
+                case 'straddle':
+                    const straddleStrike = parseFloat(document.getElementById('straddleStrike')?.value) || stockPrice;
+                    const callPayoffStraddle = Math.max(0, currentPrice - straddleStrike);
+                    const putPayoffStraddle = Math.max(0, straddleStrike - currentPrice);
+                    return callPayoffStraddle + putPayoffStraddle;
+                    
+                case 'strangle':
+                    const putStrikeStrangle = parseFloat(document.getElementById('putStrike')?.value) || stockPrice - 10;
+                    const callStrikeStrangle = parseFloat(document.getElementById('callStrike')?.value) || stockPrice + 10;
+                    const callPayoffStrangle = Math.max(0, currentPrice - callStrikeStrangle);
+                    const putPayoffStrangle = Math.max(0, putStrikeStrangle - currentPrice);
+                    return callPayoffStrangle + putPayoffStrangle;
+            }
+            
+            return 0;
+        }
+
+        function getStrategyName(strategyType) {
+            const names = {
+                'single': 'Single Option',
+                'covered-call': 'Covered Call',
+                'protective-put': 'Protective Put',
+                'straddle': 'Long Straddle',
+                'strangle': 'Long Strangle',
+                'butterfly': 'Butterfly Spread'
+            };
+            return names[strategyType] || strategyType;
+        }
+
+        function updateStrategyMetrics(strategyType, payoffs, stockPrices, currentStockPrice) {
+            const maxProfit = Math.max(...payoffs);
+            const maxLoss = Math.min(...payoffs);
+            const currentIndex = stockPrices.findIndex(p => p >= currentStockPrice);
+            const currentPayoff = payoffs[currentIndex] || 0;
+            
+            // Find breakeven points
+            const breakevens = [];
+            for (let i = 1; i < payoffs.length; i++) {
+                if ((payoffs[i-1] <= 0 && payoffs[i] >= 0) || (payoffs[i-1] >= 0 && payoffs[i] <= 0)) {
+                    breakevens.push(stockPrices[i]);
+                }
+            }
+            
+            document.getElementById('strategyMetrics').innerHTML = `
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div class="bg-green-50 p-2 rounded">
+                        <div class="font-medium text-green-800">Max Profit</div>
+                        <div class="text-green-600">$${maxProfit.toFixed(2)}</div>
+                    </div>
+                    <div class="bg-red-50 p-2 rounded">
+                        <div class="font-medium text-red-800">Max Loss</div>
+                        <div class="text-red-600">$${maxLoss.toFixed(2)}</div>
+                    </div>
+                    <div class="bg-blue-50 p-2 rounded col-span-2">
+                        <div class="font-medium text-blue-800">Breakevens</div>
+                        <div class="text-blue-600">$${breakevens.map(b => b.toFixed(2)).join(', ')}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize payoff chart when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add small delay to ensure Chart.js is ready
+            setTimeout(() => {
+                if (typeof Chart !== 'undefined') {
+                    initializePayoffChart();
+                    populateStrategyParams('single');
+                }
+            }, 500);
+        });
+
+        // Auto-update strategy params when strategy type changes
+        document.addEventListener('change', function(e) {
+            if (e.target.id === 'strategyType') {
+                populateStrategyParams(e.target.value);
+            }
+        });
     </script>
 </body>
 </html>
