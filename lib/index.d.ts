@@ -12,7 +12,7 @@ export type OptionType = 'call' | 'put';
 export type ExerciseStyle = 'american' | 'european';
 
 /** Dividend category for stock filtering */
-export type DividendCategory = 'tech' | 'finance' | 'healthcare' | 'consumer' | 'industrial' | 'reit' | 'utilities' | 'energy';
+export type DividendCategory = 'tech' | 'finance' | 'healthcare' | 'consumer' | 'industrial' | 'reits' | 'utilities' | 'energy';
 
 /** Base option parameters */
 export interface OptionParameters {

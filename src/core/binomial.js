@@ -52,7 +52,7 @@ export function binomialPrice({
 
     // Validate risk-neutral probability
     if (p < 0 || p > 1) {
-        throw new Error(`Invalid risk-neutral probability: ${p.toFixed(4)}. Check parameters.`);
+        throw new Error(`Invalid risk-neutral probability p=${p.toFixed(6)} with dt=${dt.toExponential()}, u=${u.toFixed(6)}, d=${d.toFixed(6)}. Check (r−q), σ, or steps.`);
     }
 
     // Initialize option values at maturity

@@ -62,8 +62,7 @@
     "test:coverage": "node --test --experimental-test-coverage tests/unit.test.js",
     "test:all": "npm run test:unit && npm run test:legacy && npm run validate",
     "validate": "node tests/validate-real-market.cjs",
-    "example": "node examples/basic-usage.js",
-    "docs": "node scripts/generate-docs.js"
+    "example": "node examples/basic-usage.js"
   },
   "keywords": [
     "options-education",

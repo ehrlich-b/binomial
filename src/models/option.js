@@ -357,9 +357,8 @@ export class Option {
      * @returns {Object} Complete option analysis
      */
     summary() {
-        const binomialPrice = this.binomialPrice();
-        const blackScholesPrice = this.blackScholesPrice();
         const trinomialPrice = this.trinomialPrice();
+        const intrinsicValue = this.intrinsicValue();
         const greeks = this.binomialGreeks();
         
         return {
@@ -377,13 +376,13 @@ export class Option {
                 dayCount: this.dayCount
             },
             pricing: {
-                binomial: binomialPrice,
+                binomial: this.binomialPrice(),
                 trinomial: trinomialPrice,
-                blackScholes: blackScholesPrice,
+                blackScholes: this.blackScholesPrice(),
                 jumpDiffusion: this.jumpDiffusionPrice(),
                 monteCarlo: this.monteCarloPrice({ simulations: 50000 }).price,
-                intrinsic: this.intrinsicValue(),
-                timeValue: trinomialPrice - this.intrinsicValue()
+                intrinsic: intrinsicValue,
+                timeValue: trinomialPrice - intrinsicValue
             },
             characteristics: {
                 moneyness: this.moneyness(),
