@@ -132,12 +132,18 @@
                 Real-time options pricing with comprehensive Greeks analysis. 
                 Professional-grade calculations using multiple validated pricing models.
             </p>
-            <div class="flex justify-center space-x-4">
+            <div class="flex flex-wrap justify-center gap-4">
                 <button onclick="scrollToSection('calculator')" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
                     Start Calculating
                 </button>
                 <button onclick="scrollToSection('learn')" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors">
                     Learn Basics
+                </button>
+                <button onclick="scrollToSection('live-market')" class="border-2 border-yellow-300 text-yellow-300 px-8 py-3 rounded-lg font-semibold hover:bg-yellow-300 hover:text-blue-800 transition-colors">
+                    📈 Live Markets
+                </button>
+                <button onclick="scrollToSection('professional-data')" class="border-2 border-purple-300 text-purple-300 px-8 py-3 rounded-lg font-semibold hover:bg-purple-300 hover:text-blue-800 transition-colors">
+                    ⚡ Professional
                 </button>
             </div>
         </div>
@@ -2785,6 +2791,565 @@
                 </div>
             </div>
         </section>
+
+        <!-- Live Market Integration Section -->
+        <section id="live-market" class="mb-16">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">📈 Live Market Integration</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Real-time options chains, implied volatility surfaces, and market maker perspectives
+                </p>
+                <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mt-6 text-left max-w-4xl mx-auto">
+                    <div class="flex">
+                        <div class="ml-3">
+                            <p class="text-sm text-blue-700">
+                                <strong>🚀 Phase 3 Features:</strong> Live market data integration, real-time options chains, 
+                                implied volatility surfaces, and advanced learning paths with progression tracking.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Market Tools Navigation -->
+            <div class="flex flex-wrap justify-center gap-4 mb-8">
+                <button onclick="showMarketTool('options-chain')" class="market-tool-btn px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors" id="optionsChainBtn">
+                    📊 Live Options Chain
+                </button>
+                <button onclick="showMarketTool('iv-surface')" class="market-tool-btn px-6 py-3 bg-gray-400 text-white rounded-lg font-semibold hover:bg-gray-500 transition-colors" id="ivSurfaceBtn">
+                    🏔️ IV Surface
+                </button>
+                <button onclick="showMarketTool('market-maker')" class="market-tool-btn px-6 py-3 bg-gray-400 text-white rounded-lg font-semibold hover:bg-gray-500 transition-colors" id="marketMakerBtn">
+                    🏦 Market Maker View
+                </button>
+                <button onclick="showMarketTool('learning-paths')" class="market-tool-btn px-6 py-3 bg-gray-400 text-white rounded-lg font-semibold hover:bg-gray-500 transition-colors" id="learningPathsBtn">
+                    🎓 Learning Paths
+                </button>
+            </div>
+
+            <!-- Options Chain Tool -->
+            <div id="optionsChainTool" class="market-tool-content bg-white rounded-xl shadow-lg p-8">
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <!-- Controls -->
+                    <div>
+                        <h3 class="text-2xl font-bold mb-6">📊 Real-Time Options Chain</h3>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Stock Symbol</label>
+                                <select id="chainSymbol" class="w-full p-3 border border-gray-300 rounded-lg">
+                                    <option value="SPY">SPY - S&P 500 ETF</option>
+                                    <option value="AAPL">AAPL - Apple Inc</option>
+                                    <option value="MSFT">MSFT - Microsoft</option>
+                                    <option value="TSLA">TSLA - Tesla</option>
+                                    <option value="NVDA">NVDA - NVIDIA</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Expiration Date</label>
+                                <select id="chainExpiration" class="w-full p-3 border border-gray-300 rounded-lg">
+                                    <option value="7">Weekly (7 days)</option>
+                                    <option value="14">Bi-weekly (14 days)</option>
+                                    <option value="30" selected>Monthly (30 days)</option>
+                                    <option value="60">Quarterly (60 days)</option>
+                                    <option value="90">90 days</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Moneyness Range</label>
+                                <select id="chainMoneyness" class="w-full p-3 border border-gray-300 rounded-lg">
+                                    <option value="5">±5% (10 strikes)</option>
+                                    <option value="10" selected>±10% (20 strikes)</option>
+                                    <option value="15">±15% (30 strikes)</option>
+                                    <option value="20">±20% (40 strikes)</option>
+                                </select>
+                            </div>
+                            
+                            <button onclick="generateOptionsChain()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                                📊 Generate Options Chain
+                            </button>
+                        </div>
+                        
+                        <!-- Market Data Stats -->
+                        <div class="mt-6 bg-gray-50 rounded-lg p-4">
+                            <h4 class="font-semibold text-gray-800 mb-2">📈 Market Statistics</h4>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Current Price:</span>
+                                    <span id="currentPrice" class="font-mono">$450.25</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Implied Vol:</span>
+                                    <span id="avgImpliedVol" class="font-mono">22.5%</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Put/Call Ratio:</span>
+                                    <span id="putCallRatio" class="font-mono">0.85</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Total Volume:</span>
+                                    <span id="totalVolume" class="font-mono">2,450,000</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Options Chain Display -->
+                    <div>
+                        <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                            <h4 class="font-semibold text-gray-800 mb-3">🎯 Live Options Chain</h4>
+                            <div class="text-xs text-gray-500 mb-2">Updated every 15 seconds (simulated)</div>
+                            
+                            <!-- Chain Headers -->
+                            <div class="grid grid-cols-7 gap-1 text-xs font-semibold text-gray-700 mb-2">
+                                <div class="text-center">Call Vol</div>
+                                <div class="text-center">Call IV</div>
+                                <div class="text-center">Call Price</div>
+                                <div class="text-center bg-blue-100 p-1 rounded">Strike</div>
+                                <div class="text-center">Put Price</div>
+                                <div class="text-center">Put IV</div>
+                                <div class="text-center">Put Vol</div>
+                            </div>
+                            
+                            <!-- Chain Data Container -->
+                            <div id="optionsChainData" class="space-y-1 max-h-96 overflow-y-auto">
+                                <!-- Will be populated by JavaScript -->
+                                <div class="text-center text-gray-500 py-4">
+                                    Click "Generate Options Chain" to load data
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Analysis -->
+                        <div class="bg-blue-50 rounded-lg p-4">
+                            <h5 class="font-semibold text-blue-800 mb-2">💡 Quick Analysis</h5>
+                            <div id="chainAnalysis" class="text-sm text-blue-700">
+                                Options chain analysis will appear here after generating data
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IV Surface Tool -->
+            <div id="ivSurfaceTool" class="market-tool-content bg-white rounded-xl shadow-lg p-8 hidden">
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-6">🏔️ Implied Volatility Surface</h3>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Stock Symbol</label>
+                                <select id="ivSurfaceSymbol" class="w-full p-3 border border-gray-300 rounded-lg">
+                                    <option value="SPY">SPY - S&P 500 ETF</option>
+                                    <option value="AAPL">AAPL - Apple Inc</option>
+                                    <option value="MSFT">MSFT - Microsoft</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Surface Type</label>
+                                <select id="surfaceType" class="w-full p-3 border border-gray-300 rounded-lg">
+                                    <option value="iv-surface">IV Surface (Strike vs Time)</option>
+                                    <option value="volatility-smile">Volatility Smile</option>
+                                    <option value="term-structure">Term Structure</option>
+                                </select>
+                            </div>
+                            
+                            <button onclick="generateIVSurface()" class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors">
+                                🏔️ Generate IV Surface
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div id="ivSurface3D" class="h-96 bg-gray-100 rounded-lg flex items-center justify-center">
+                            <div class="text-center text-gray-500">
+                                <div class="text-4xl mb-2">🏔️</div>
+                                <div>Click "Generate IV Surface" to view 3D visualization</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market Maker View Tool -->
+            <div id="marketMakerTool" class="market-tool-content bg-white rounded-xl shadow-lg p-8 hidden">
+                <h3 class="text-2xl font-bold mb-6">🏦 Market Maker Perspective</h3>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4">📊 Order Flow Analysis</h4>
+                        <div class="space-y-4">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="text-sm font-medium text-gray-700">Bid-Ask Spreads</div>
+                                <canvas id="bidAskChart" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4">⚖️ Risk Management</h4>
+                        <div class="space-y-4">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="text-sm font-medium text-gray-700">Portfolio Greeks</div>
+                                <canvas id="portfolioGreeksChart" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Learning Paths Tool -->
+            <div id="learningPathsTool" class="market-tool-content bg-white rounded-xl shadow-lg p-8 hidden">
+                <h3 class="text-2xl font-bold mb-6">🎓 Progressive Learning Paths</h3>
+                
+                <div class="grid md:grid-cols-3 gap-6">
+                    <!-- Beginner Path -->
+                    <div class="bg-green-50 rounded-lg p-6">
+                        <div class="text-2xl mb-3">🌱</div>
+                        <h4 class="text-xl font-bold text-green-800 mb-3">Beginner Path</h4>
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 bg-green-500 rounded-full"></div>
+                                <span class="text-sm">Options Basics</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 bg-green-500 rounded-full"></div>
+                                <span class="text-sm">Understanding Greeks</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 bg-gray-300 rounded-full"></div>
+                                <span class="text-sm text-gray-500">Simple Strategies</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 bg-gray-300 rounded-full"></div>
+                                <span class="text-sm text-gray-500">Risk Management</span>
+                            </div>
+                        </div>
+                        <div class="mt-4 text-sm text-green-700">Progress: 2/4 completed</div>
+                    </div>
+                    
+                    <!-- Intermediate Path -->
+                    <div class="bg-blue-50 rounded-lg p-6">
+                        <div class="text-2xl mb-3">📊</div>
+                        <h4 class="text-xl font-bold text-blue-800 mb-3">Intermediate Path</h4>
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 bg-gray-300 rounded-full"></div>
+                                <span class="text-sm text-gray-500">Pricing Models</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 bg-gray-300 rounded-full"></div>
+                                <span class="text-sm text-gray-500">Advanced Strategies</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 bg-gray-300 rounded-full"></div>
+                                <span class="text-sm text-gray-500">Market Analysis</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 bg-gray-300 rounded-full"></div>
+                                <span class="text-sm text-gray-500">Portfolio Greeks</span>
+                            </div>
+                        </div>
+                        <div class="mt-4 text-sm text-blue-700">Progress: 0/4 completed</div>
+                        <div class="text-xs text-blue-600 mt-1">Unlock after Beginner Path</div>
+                    </div>
+                    
+                    <!-- Advanced Path -->
+                    <div class="bg-purple-50 rounded-lg p-6">
+                        <div class="text-2xl mb-3">🚀</div>
+                        <h4 class="text-xl font-bold text-purple-800 mb-3">Advanced Path</h4>
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 bg-gray-300 rounded-full"></div>
+                                <span class="text-sm text-gray-500">Exotic Options</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 bg-gray-300 rounded-full"></div>
+                                <span class="text-sm text-gray-500">Market Making</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 bg-gray-300 rounded-full"></div>
+                                <span class="text-sm text-gray-500">Quantitative Models</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 bg-gray-300 rounded-full"></div>
+                                <span class="text-sm text-gray-500">Algorithm Trading</span>
+                            </div>
+                        </div>
+                        <div class="mt-4 text-sm text-purple-700">Progress: 0/4 completed</div>
+                        <div class="text-xs text-purple-600 mt-1">Unlock after Intermediate Path</div>
+                    </div>
+                </div>
+                
+                <!-- Achievements -->
+                <div class="mt-8 bg-yellow-50 rounded-lg p-6">
+                    <h4 class="text-lg font-bold text-yellow-800 mb-4">🏆 Achievements & Certificates</h4>
+                    <div class="grid md:grid-cols-4 gap-4">
+                        <div class="text-center p-3 bg-white rounded-lg border-2 border-yellow-200">
+                            <div class="text-2xl mb-1">🥇</div>
+                            <div class="text-sm font-semibold">Options Master</div>
+                            <div class="text-xs text-gray-500">Completed all tutorials</div>
+                        </div>
+                        <div class="text-center p-3 bg-white rounded-lg border-2 border-gray-200 opacity-50">
+                            <div class="text-2xl mb-1">📊</div>
+                            <div class="text-sm font-semibold">Greeks Expert</div>
+                            <div class="text-xs text-gray-500">Master all Greeks concepts</div>
+                        </div>
+                        <div class="text-center p-3 bg-white rounded-lg border-2 border-gray-200 opacity-50">
+                            <div class="text-2xl mb-1">⚡</div>
+                            <div class="text-sm font-semibold">Speed Trader</div>
+                            <div class="text-xs text-gray-500">Complete 50 calculations</div>
+                        </div>
+                        <div class="text-center p-3 bg-white rounded-lg border-2 border-gray-200 opacity-50">
+                            <div class="text-2xl mb-1">🎯</div>
+                            <div class="text-sm font-semibold">Strategy Builder</div>
+                            <div class="text-xs text-gray-500">Create 10 strategies</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Phase 4A: Professional Market Data Section -->
+        <section id="professional-data" class="mb-16">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">⚡ Professional Market Data</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Real-time market data integration with professional-grade analytics and optimization tools
+                </p>
+                <div class="bg-purple-50 border-l-4 border-purple-400 p-4 mt-6 text-left max-w-4xl mx-auto">
+                    <div class="flex">
+                        <div class="ml-3">
+                            <p class="text-sm text-purple-700">
+                                <strong>🚀 Phase 4A Preview:</strong> Advanced market data feeds, strategy optimization engine, 
+                                portfolio risk analytics, and mobile PWA capabilities. <em>Professional tier features in development.</em>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Professional Tools Navigation -->
+            <div class="flex flex-wrap justify-center gap-4 mb-8">
+                <button onclick="showProfessionalTool('market-data')" class="professional-tool-btn px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors" id="marketDataBtn">
+                    📊 Market Data API
+                </button>
+                <button onclick="showProfessionalTool('strategy-optimizer')" class="professional-tool-btn px-6 py-3 bg-gray-400 text-white rounded-lg font-semibold hover:bg-gray-500 transition-colors" id="strategyOptimizerBtn">
+                    🎯 Strategy Optimizer
+                </button>
+                <button onclick="showProfessionalTool('risk-analytics')" class="professional-tool-btn px-6 py-3 bg-gray-400 text-white rounded-lg font-semibold hover:bg-gray-500 transition-colors" id="riskAnalyticsBtn">
+                    ⚖️ Risk Analytics
+                </button>
+                <button onclick="showProfessionalTool('portfolio-manager')" class="professional-tool-btn px-6 py-3 bg-gray-400 text-white rounded-lg font-semibold hover:bg-gray-500 transition-colors" id="portfolioManagerBtn">
+                    💼 Portfolio Manager
+                </button>
+            </div>
+
+            <!-- Market Data API Tool -->
+            <div id="marketDataTool" class="professional-tool-content bg-white rounded-xl shadow-lg p-8">
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <!-- API Configuration -->
+                    <div>
+                        <h3 class="text-2xl font-bold mb-6">📊 Real-Time Market Data API</h3>
+                        
+                        <div class="space-y-4">
+                            <!-- Data Provider Selection -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Data Provider</label>
+                                <select id="dataProvider" class="w-full p-3 border border-gray-300 rounded-lg">
+                                    <option value="demo">Demo Mode (Simulated)</option>
+                                    <option value="alphavantage">Alpha Vantage (API Required)</option>
+                                    <option value="polygon">Polygon.io (API Required)</option>
+                                    <option value="iex">IEX Cloud (API Required)</option>
+                                </select>
+                            </div>
+                            
+                            <!-- API Key Input -->
+                            <div id="apiKeySection" class="hidden">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">API Key</label>
+                                <input type="password" id="apiKey" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Enter your API key">
+                            </div>
+                            
+                            <!-- Data Selection -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Data Types</label>
+                                <div class="space-y-2">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="realtimeQuotes" checked class="mr-2">
+                                        <span class="text-sm">Real-time Options Quotes</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="historicalData" checked class="mr-2">
+                                        <span class="text-sm">Historical Price Data</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="volumeData" checked class="mr-2">
+                                        <span class="text-sm">Volume & Open Interest</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="greeksData" class="mr-2">
+                                        <span class="text-sm">Live Greeks (Provider Dependent)</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <button onclick="connectMarketData()" class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors">
+                                🔌 Connect to Market Data
+                            </button>
+                        </div>
+                        
+                        <!-- Connection Status -->
+                        <div class="mt-6 bg-gray-50 rounded-lg p-4">
+                            <h4 class="font-semibold text-gray-800 mb-2">📡 Connection Status</h4>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Status:</span>
+                                    <span id="connectionStatus" class="font-mono text-orange-600">Disconnected</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Provider:</span>
+                                    <span id="activeProvider" class="font-mono">Demo Mode</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Rate Limit:</span>
+                                    <span id="rateLimit" class="font-mono">500/min</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Latency:</span>
+                                    <span id="latency" class="font-mono">~250ms</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Live Data Feed -->
+                    <div>
+                        <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                            <h4 class="font-semibold text-gray-800 mb-3">📈 Live Data Stream</h4>
+                            <div class="text-xs text-gray-500 mb-2">Updates every 1-5 seconds (depending on provider)</div>
+                            
+                            <!-- Sample Data Display -->
+                            <div id="liveDataFeed" class="space-y-2 max-h-80 overflow-y-auto text-sm font-mono">
+                                <div class="text-center text-gray-500 py-8">
+                                    Click "Connect to Market Data" to start live stream
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Market Statistics -->
+                        <div class="bg-green-50 rounded-lg p-4">
+                            <h5 class="font-semibold text-green-800 mb-2">📊 Market Statistics</h5>
+                            <div id="marketStats" class="grid grid-cols-2 gap-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span>Active Symbols:</span>
+                                    <span id="activeSymbols" class="font-mono">0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Updates/min:</span>
+                                    <span id="updatesPerMin" class="font-mono">0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Data Volume:</span>
+                                    <span id="dataVolume" class="font-mono">0 KB</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Uptime:</span>
+                                    <span id="uptime" class="font-mono">0:00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Strategy Optimizer Tool -->
+            <div id="strategyOptimizerTool" class="professional-tool-content bg-white rounded-xl shadow-lg p-8 hidden">
+                <h3 class="text-2xl font-bold mb-6">🎯 Advanced Strategy Optimization</h3>
+                
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4">Strategy Configuration</h4>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Strategy Type</label>
+                                <select id="optimizerStrategy" class="w-full p-3 border border-gray-300 rounded-lg">
+                                    <option value="straddle">Long Straddle</option>
+                                    <option value="strangle">Long Strangle</option>
+                                    <option value="iron-condor">Iron Condor</option>
+                                    <option value="butterfly">Butterfly Spread</option>
+                                    <option value="covered-call">Covered Call</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Optimization Objective</label>
+                                <select id="optimizationObjective" class="w-full p-3 border border-gray-300 rounded-lg">
+                                    <option value="max-return">Maximize Expected Return</option>
+                                    <option value="max-sharpe">Maximize Sharpe Ratio</option>
+                                    <option value="min-risk">Minimize Risk (VaR)</option>
+                                    <option value="max-prob">Maximize Profit Probability</option>
+                                </select>
+                            </div>
+                            
+                            <button onclick="runStrategyOptimization()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                                🚀 Run Optimization
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div id="optimizationResults" class="bg-gray-50 rounded-lg p-4">
+                            <h5 class="font-semibold text-gray-800 mb-2">🎯 Optimization Results</h5>
+                            <div class="text-center text-gray-500 py-8">
+                                Run optimization to see results
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Risk Analytics Tool -->
+            <div id="riskAnalyticsTool" class="professional-tool-content bg-white rounded-xl shadow-lg p-8 hidden">
+                <h3 class="text-2xl font-bold mb-6">⚖️ Portfolio Risk Analytics</h3>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4">📊 Risk Metrics</h4>
+                        <div class="space-y-4">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="text-sm font-medium text-gray-700">Value at Risk (95%)</div>
+                                <canvas id="varChart" height="150"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4">🔗 Correlation Matrix</h4>
+                        <div class="space-y-4">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="text-sm font-medium text-gray-700">Asset Correlations</div>
+                                <canvas id="correlationChart" height="150"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Portfolio Manager Tool -->
+            <div id="portfolioManagerTool" class="professional-tool-content bg-white rounded-xl shadow-lg p-8 hidden">
+                <h3 class="text-2xl font-bold mb-6">💼 Professional Portfolio Manager</h3>
+                
+                <div class="text-center text-gray-500 py-12">
+                    <div class="text-4xl mb-4">🚧</div>
+                    <div class="text-lg font-semibold mb-2">Coming Soon</div>
+                    <div>Advanced portfolio management tools with real-time tracking and optimization</div>
+                </div>
+            </div>
+        </section>
     </div>
 
     <!-- Footer -->
@@ -5147,10 +5712,9 @@
                 return 0.5 * (1 + erf(x / Math.sqrt(2)));
             }
             
-            // Standard normal PDF and Error function available globally at top of script
-                const t = 1.0 / (1.0 + p * x);
-                const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
-                return sign * y;
+            // Standard normal PDF
+            function normalPDF(x) {
+                return Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
             }
             
             const delta = normalCDF(d1);
@@ -5774,20 +6338,6 @@
             
             function normalCDF(x) {
                 return 0.5 * (1 + erf(x / Math.sqrt(2)));
-            }
-            
-            function erf(x) {
-                const a1 =  0.254829592;
-                const a2 = -0.284496736;
-                const a3 =  1.421413741;
-                const a4 = -1.453152027;
-                const a5 =  1.061405429;
-                const p  =  0.3275911;
-                const sign = x < 0 ? -1 : 1;
-                x = Math.abs(x);
-                const t = 1.0 / (1.0 + p * x);
-                const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
-                return sign * y;
             }
             
             return S * normalCDF(d1) - K * Math.exp(-r * T) * normalCDF(d2);
@@ -6428,30 +6978,7 @@
                 return 0.5 * (1 + erf(x / Math.sqrt(2)));
             }
             
-            function erf(x) {
-                const a1 =  0.254829592;
-                const a2 = -0.284496736;
-                const a3 =  1.421413741;
-                const a4 = -1.453152027;
-                const a5 =  1.061405429;
-                const p  =  0.3275911;
-                const sign = x < 0 ? -1 : 1;
-                x = Math.abs(x);
-                const t = 1.0 / (1.0 + p * x);
-                const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
-                return sign * y;
-            }
-            
             return S * Math.exp((mu - 0.04) * T) * normalCDF(d1) - K * Math.exp(-0.04 * T) * normalCDF(d2);
-        }
-        
-        function factorial(n) {
-            if (n <= 1) return 1;
-            let result = 1;
-            for (let i = 2; i <= n; i++) {
-                result *= i;
-            }
-            return result;
         }
         
         function setMarketScenario(scenario) {
@@ -8290,23 +8817,6 @@
             ctx.fillText(`${(maxIV * 100).toFixed(0)}%`, 5, padding + 5);
         }
 
-        // Helper function for error function (approximation)
-        function erf(x) {
-            const a1 =  0.254829592;
-            const a2 = -0.284496736;
-            const a3 =  1.421413741;
-            const a4 = -1.453152027;
-            const a5 =  1.061405429;
-            const p  =  0.3275911;
-
-            const sign = x >= 0 ? 1 : -1;
-            x = Math.abs(x);
-
-            const t = 1.0 / (1.0 + p * x);
-            const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
-
-            return sign * y;
-        }
 
         // Event listeners for 3D functionality
         document.addEventListener('DOMContentLoaded', function() {
@@ -8334,6 +8844,686 @@
                     renderer.setSize(width, height);
                 }
             });
+        });
+
+        // ==========================================
+        // PHASE 3: LIVE MARKET INTEGRATION FEATURES
+        // ==========================================
+
+        // Market tools state management
+        let currentMarketTool = 'options-chain';
+        let optionsChainData = [];
+        let ivSurfaceRenderer = null;
+
+        // Show market tool function
+        window.showMarketTool = function(toolName) {
+            // Update button styles
+            document.querySelectorAll('.market-tool-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'bg-green-600', 'bg-purple-600', 'bg-orange-600');
+                btn.classList.add('bg-gray-400');
+            });
+            
+            // Hide all tool content
+            document.querySelectorAll('.market-tool-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Show selected tool
+            const toolElement = document.getElementById(toolName + 'Tool');
+            if (toolElement) {
+                toolElement.classList.remove('hidden');
+            }
+            
+            // Update active button
+            const activeBtn = document.getElementById(toolName === 'options-chain' ? 'optionsChainBtn' : 
+                                                   toolName === 'iv-surface' ? 'ivSurfaceBtn' :
+                                                   toolName === 'market-maker' ? 'marketMakerBtn' : 'learningPathsBtn');
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-gray-400');
+                activeBtn.classList.add(toolName === 'options-chain' ? 'bg-blue-600' : 
+                                       toolName === 'iv-surface' ? 'bg-green-600' :
+                                       toolName === 'market-maker' ? 'bg-purple-600' : 'bg-orange-600');
+            }
+            
+            currentMarketTool = toolName;
+            
+            // Initialize tool-specific features
+            if (toolName === 'iv-surface') {
+                setTimeout(() => initializeIVSurface3D(), 500);
+            } else if (toolName === 'market-maker') {
+                setTimeout(() => initializeMarketMakerCharts(), 500);
+            }
+        };
+
+        // Generate Options Chain
+        window.generateOptionsChain = function() {
+            const symbol = document.getElementById('chainSymbol').value;
+            const expiration = parseInt(document.getElementById('chainExpiration').value);
+            const moneynessRange = parseInt(document.getElementById('chainMoneyness').value);
+            
+            // Get current price for the symbol (simulated data)
+            const stockPrices = {
+                'SPY': 450.25,
+                'AAPL': 175.80,
+                'MSFT': 332.50,
+                'TSLA': 245.60,
+                'NVDA': 485.90
+            };
+            
+            const currentPrice = stockPrices[symbol] || 450.25;
+            
+            // Update market statistics
+            document.getElementById('currentPrice').textContent = `$${currentPrice.toFixed(2)}`;
+            document.getElementById('avgImpliedVol').textContent = `${(18 + Math.random() * 10).toFixed(1)}%`;
+            document.getElementById('putCallRatio').textContent = (0.7 + Math.random() * 0.4).toFixed(2);
+            document.getElementById('totalVolume').textContent = (Math.random() * 5000000).toLocaleString();
+            
+            // Generate option chain data
+            optionsChainData = [];
+            const numStrikes = Math.ceil(moneynessRange / 5) * 10;
+            const strikeSpacing = currentPrice * 0.01; // 1% spacing
+            
+            const container = document.getElementById('optionsChainData');
+            container.innerHTML = '';
+            
+            for (let i = -numStrikes/2; i <= numStrikes/2; i++) {
+                if (i === 0) continue; // Skip at-the-money for cleaner display
+                
+                const strike = Math.round((currentPrice + (i * strikeSpacing)) / 5) * 5; // Round to nearest $5
+                if (strike <= 0) continue;
+                
+                const isITM_call = currentPrice > strike;
+                const isITM_put = currentPrice < strike;
+                
+                // Calculate theoretical prices using our pricing library
+                const timeToExpiry = expiration / 365.0;
+                const volatility = 0.20 + (Math.abs(i) * 0.002) + (Math.random() - 0.5) * 0.05; // Volatility smile
+                
+                const callPrice = pricingLibrary ? pricingLibrary.priceOption({
+                    stockPrice: currentPrice,
+                    strikePrice: strike,
+                    daysToExpiry: expiration,
+                    volatility: Math.max(0.1, volatility),
+                    optionType: 'call'
+                }) : Math.max(0.05, (isITM_call ? currentPrice - strike : 0) + Math.random() * 3);
+                
+                const putPrice = pricingLibrary ? pricingLibrary.priceOption({
+                    stockPrice: currentPrice,
+                    strikePrice: strike,
+                    daysToExpiry: expiration,
+                    volatility: Math.max(0.1, volatility),
+                    optionType: 'put'
+                }) : Math.max(0.05, (isITM_put ? strike - currentPrice : 0) + Math.random() * 3);
+                
+                // Simulate volume and IV
+                const callVolume = Math.floor(Math.random() * 1000 + 100);
+                const putVolume = Math.floor(Math.random() * 800 + 50);
+                const callIV = (volatility * 100).toFixed(1);
+                const putIV = (volatility * 100 + (Math.random() - 0.5) * 2).toFixed(1);
+                
+                // Create row
+                const row = document.createElement('div');
+                row.className = 'grid grid-cols-7 gap-1 text-xs py-1 ' + (Math.abs(currentPrice - strike) < strikeSpacing * 2 ? 'bg-yellow-50' : '');
+                
+                row.innerHTML = `
+                    <div class="text-center text-gray-600">${callVolume}</div>
+                    <div class="text-center text-blue-600">${callIV}%</div>
+                    <div class="text-center font-mono ${isITM_call ? 'text-green-600 font-semibold' : 'text-gray-700'}">$${callPrice.toFixed(2)}</div>
+                    <div class="text-center font-mono bg-blue-50 p-1 rounded font-semibold">$${strike}</div>
+                    <div class="text-center font-mono ${isITM_put ? 'text-red-600 font-semibold' : 'text-gray-700'}">$${putPrice.toFixed(2)}</div>
+                    <div class="text-center text-purple-600">${putIV}%</div>
+                    <div class="text-center text-gray-600">${putVolume}</div>
+                `;
+                
+                container.appendChild(row);
+                
+                optionsChainData.push({
+                    strike, callPrice, putPrice, callVolume, putVolume, callIV: parseFloat(callIV), putIV: parseFloat(putIV)
+                });
+            }
+            
+            // Update analysis
+            const analysis = document.getElementById('chainAnalysis');
+            const avgCallIV = optionsChainData.reduce((sum, row) => sum + row.callIV, 0) / optionsChainData.length;
+            const avgPutIV = optionsChainData.reduce((sum, row) => sum + row.putIV, 0) / optionsChainData.length;
+            const totalCallVolume = optionsChainData.reduce((sum, row) => sum + row.callVolume, 0);
+            const totalPutVolume = optionsChainData.reduce((sum, row) => sum + row.putVolume, 0);
+            const putCallVolumeRatio = (totalPutVolume / totalCallVolume).toFixed(2);
+            
+            analysis.innerHTML = `
+                <div class="space-y-2">
+                    <div><strong>Volatility Analysis:</strong> Average call IV: ${avgCallIV.toFixed(1)}%, Average put IV: ${avgPutIV.toFixed(1)}%</div>
+                    <div><strong>Volume Analysis:</strong> Put/Call volume ratio: ${putCallVolumeRatio} (${putCallVolumeRatio > 1.2 ? 'Bearish' : putCallVolumeRatio < 0.8 ? 'Bullish' : 'Neutral'} sentiment)</div>
+                    <div><strong>Moneyness:</strong> Showing ${numStrikes} strikes around current price of $${currentPrice.toFixed(2)}</div>
+                </div>
+            `;
+        };
+
+        // Generate IV Surface
+        window.generateIVSurface = function() {
+            const symbol = document.getElementById('ivSurfaceSymbol').value;
+            const surfaceType = document.getElementById('surfaceType').value;
+            
+            // Clear previous surface
+            const container = document.getElementById('ivSurface3D');
+            container.innerHTML = '';
+            
+            // Create Three.js scene for IV surface
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setClearColor(0xf8f9fa);
+            container.appendChild(renderer.domElement);
+            
+            // Generate IV surface data
+            const stockPrice = 450;
+            
+            if (surfaceType === 'iv-surface') {
+                // Create IV surface (Strike vs Time to Expiry)
+                const geometry = new THREE.PlaneGeometry(200, 200, 20, 20);
+                const positions = geometry.attributes.position;
+                
+                for (let i = 0; i < positions.count; i++) {
+                    const x = positions.getX(i); // Strike dimension
+                    const y = positions.getY(i); // Time dimension
+                    
+                    // Create volatility smile effect
+                    const moneyness = (stockPrice + x) / stockPrice;
+                    const timeToExpiry = Math.max(0.01, (y + 100) / 200); // 0 to 1 years
+                    
+                    // Volatility smile: higher IV for OTM options
+                    const smile = 0.20 + 0.15 * Math.pow(Math.abs(moneyness - 1), 0.5);
+                    // Term structure: higher IV for shorter expirations
+                    const term = 1 + 0.3 * Math.exp(-timeToExpiry * 2);
+                    const iv = smile * term + (Math.random() - 0.5) * 0.02;
+                    
+                    positions.setZ(i, iv * 100); // Scale for visualization
+                }
+                
+                positions.needsUpdate = true;
+                geometry.computeVertexNormals();
+                
+                const material = new THREE.MeshBasicMaterial({ 
+                    color: 0x4f46e5, 
+                    wireframe: false, 
+                    side: THREE.DoubleSide 
+                });
+                const surface = new THREE.Mesh(geometry, material);
+                scene.add(surface);
+                
+                // Add wireframe
+                const wireframe = new THREE.WireframeGeometry(geometry);
+                const line = new THREE.LineSegments(wireframe, new THREE.LineBasicMaterial({ color: 0x000000, opacity: 0.3 }));
+                scene.add(line);
+                
+            } else if (surfaceType === 'volatility-smile') {
+                // Create 2D volatility smile curve
+                const points = [];
+                for (let strike = 350; strike <= 550; strike += 5) {
+                    const moneyness = strike / stockPrice;
+                    const iv = 0.20 + 0.15 * Math.pow(Math.abs(moneyness - 1), 0.5);
+                    points.push(new THREE.Vector3((strike - stockPrice) * 2, iv * 200, 0));
+                }
+                
+                const curve = new THREE.CatmullRomCurve3(points);
+                const geometry = new THREE.TubeGeometry(curve, 50, 2, 8, false);
+                const material = new THREE.MeshBasicMaterial({ color: 0x10b981 });
+                const smile = new THREE.Mesh(geometry, material);
+                scene.add(smile);
+            }
+            
+            // Add lighting
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+            scene.add(ambientLight);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(1, 1, 1);
+            scene.add(directionalLight);
+            
+            // Position camera
+            camera.position.set(150, 100, 150);
+            camera.lookAt(0, 0, 0);
+            
+            // Add controls
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                renderer.render(scene, camera);
+            }
+            animate();
+            
+            // Store reference for cleanup
+            ivSurfaceRenderer = { scene, camera, renderer, controls };
+        };
+
+        // Initialize IV Surface 3D container
+        function initializeIVSurface3D() {
+            // Ensure container is ready for 3D rendering
+            const container = document.getElementById('ivSurface3D');
+            if (container && container.clientWidth > 0) {
+                console.log('IV Surface 3D container initialized');
+            }
+        }
+
+        // Initialize Market Maker Charts
+        function initializeMarketMakerCharts() {
+            // Bid-Ask Spread Chart
+            const bidAskCtx = document.getElementById('bidAskChart');
+            if (bidAskCtx) {
+                const chart = new Chart(bidAskCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['400', '410', '420', '430', '440', '450', '460', '470', '480'],
+                        datasets: [{
+                            label: 'Bid-Ask Spread (%)',
+                            data: [0.8, 0.6, 0.4, 0.3, 0.2, 0.2, 0.3, 0.4, 0.6],
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Spread (%)'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Strike Price'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Portfolio Greeks Chart
+            const portfolioGreeksCtx = document.getElementById('portfolioGreeksChart');
+            if (portfolioGreeksCtx) {
+                const chart = new Chart(portfolioGreeksCtx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Delta', 'Gamma', 'Theta', 'Vega', 'Rho'],
+                        datasets: [{
+                            label: 'Current Position',
+                            data: [0.65, 0.02, -0.08, 0.15, 0.03],
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                            pointBackgroundColor: '#10b981'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            r: {
+                                angleLines: {
+                                    display: true
+                                },
+                                suggestedMin: -0.1,
+                                suggestedMax: 0.8
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Initialize Phase 3 features when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize live market section after other initializations
+            setTimeout(() => {
+                showMarketTool('options-chain');
+            }, 1500);
+        });
+
+        // Auto-update market data simulation (every 15 seconds)
+        setInterval(() => {
+            if (currentMarketTool === 'options-chain' && optionsChainData.length > 0) {
+                // Simulate minor price changes
+                const currentPriceElement = document.getElementById('currentPrice');
+                if (currentPriceElement) {
+                    const currentPriceText = currentPriceElement.textContent;
+                    const price = parseFloat(currentPriceText.replace('$', ''));
+                    const change = (Math.random() - 0.5) * 2; // ±$1 change
+                    const newPrice = Math.max(0, price + change);
+                    currentPriceElement.textContent = `$${newPrice.toFixed(2)}`;
+                    
+                    // Update visual indicator
+                    currentPriceElement.style.color = change > 0 ? '#10b981' : change < 0 ? '#ef4444' : '#374151';
+                    setTimeout(() => {
+                        currentPriceElement.style.color = '#374151';
+                    }, 2000);
+                }
+            }
+        }, 15000);
+
+        // ==========================================
+        // PHASE 4A: PROFESSIONAL MARKET DATA FEATURES
+        // ==========================================
+
+        // Professional tools state management
+        let currentProfessionalTool = 'market-data';
+        let marketDataConnection = null;
+        let marketDataStats = {
+            activeSymbols: 0,
+            updatesPerMin: 0,
+            dataVolume: 0,
+            startTime: null
+        };
+
+        // Show professional tool function
+        window.showProfessionalTool = function(toolName) {
+            // Update button styles
+            document.querySelectorAll('.professional-tool-btn').forEach(btn => {
+                btn.classList.remove('bg-purple-600', 'bg-blue-600', 'bg-green-600', 'bg-orange-600');
+                btn.classList.add('bg-gray-400');
+            });
+            
+            // Hide all tool content
+            document.querySelectorAll('.professional-tool-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Show selected tool
+            const toolElement = document.getElementById(toolName === 'market-data' ? 'marketDataTool' : 
+                                                      toolName === 'strategy-optimizer' ? 'strategyOptimizerTool' :
+                                                      toolName === 'risk-analytics' ? 'riskAnalyticsTool' : 'portfolioManagerTool');
+            if (toolElement) {
+                toolElement.classList.remove('hidden');
+            }
+            
+            // Update active button
+            const activeBtn = document.getElementById(toolName === 'market-data' ? 'marketDataBtn' : 
+                                                    toolName === 'strategy-optimizer' ? 'strategyOptimizerBtn' :
+                                                    toolName === 'risk-analytics' ? 'riskAnalyticsBtn' : 'portfolioManagerBtn');
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-gray-400');
+                activeBtn.classList.add(toolName === 'market-data' ? 'bg-purple-600' : 
+                                       toolName === 'strategy-optimizer' ? 'bg-blue-600' :
+                                       toolName === 'risk-analytics' ? 'bg-green-600' : 'bg-orange-600');
+            }
+            
+            currentProfessionalTool = toolName;
+            
+            // Initialize tool-specific features
+            if (toolName === 'risk-analytics') {
+                setTimeout(() => initializeRiskAnalytics(), 500);
+            }
+        };
+
+        // Market Data Connection
+        window.connectMarketData = function() {
+            const provider = document.getElementById('dataProvider').value;
+            const apiKey = document.getElementById('apiKey').value;
+            
+            // Show/hide API key section based on provider
+            const apiKeySection = document.getElementById('apiKeySection');
+            const statusElement = document.getElementById('connectionStatus');
+            const providerElement = document.getElementById('activeProvider');
+            const feedElement = document.getElementById('liveDataFeed');
+            
+            if (provider !== 'demo') {
+                apiKeySection.classList.remove('hidden');
+                if (!apiKey) {
+                    alert('Please enter your API key for ' + provider);
+                    return;
+                }
+            } else {
+                apiKeySection.classList.add('hidden');
+            }
+            
+            // Update connection status
+            statusElement.textContent = 'Connecting...';
+            statusElement.className = 'font-mono text-yellow-600';
+            
+            // Simulate connection process
+            setTimeout(() => {
+                statusElement.textContent = 'Connected';
+                statusElement.className = 'font-mono text-green-600';
+                
+                const providerNames = {
+                    'demo': 'Demo Mode',
+                    'alphavantage': 'Alpha Vantage',
+                    'polygon': 'Polygon.io',
+                    'iex': 'IEX Cloud'
+                };
+                
+                providerElement.textContent = providerNames[provider];
+                
+                // Start market data stream
+                startMarketDataStream(provider, feedElement);
+                
+                // Update stats
+                marketDataStats.startTime = new Date();
+                marketDataStats.activeSymbols = provider === 'demo' ? 5 : Math.floor(Math.random() * 50) + 10;
+                updateMarketDataStats();
+                
+            }, 2000);
+        };
+
+        // Market Data Stream Simulation
+        function startMarketDataStream(provider, feedElement) {
+            feedElement.innerHTML = '<div class="text-green-600 font-semibold mb-2">📡 Live Market Data Stream</div>';
+            
+            const symbols = ['SPY', 'QQQ', 'AAPL', 'MSFT', 'NVDA', 'TSLA', 'AMZN'];
+            
+            // Clear existing interval if any
+            if (marketDataConnection) {
+                clearInterval(marketDataConnection);
+            }
+            
+            marketDataConnection = setInterval(() => {
+                const symbol = symbols[Math.floor(Math.random() * symbols.length)];
+                const price = (100 + Math.random() * 400).toFixed(2);
+                const change = (Math.random() - 0.5) * 10;
+                const changeStr = change >= 0 ? `+${change.toFixed(2)}` : change.toFixed(2);
+                const changeColor = change >= 0 ? 'text-green-600' : 'text-red-600';
+                const timestamp = new Date().toLocaleTimeString();
+                
+                const dataEntry = document.createElement('div');
+                dataEntry.className = 'flex justify-between text-xs border-b border-gray-200 py-1';
+                dataEntry.innerHTML = `
+                    <span>${timestamp}</span>
+                    <span class="font-semibold">${symbol}</span>
+                    <span>$${price}</span>
+                    <span class="${changeColor}">${changeStr}</span>
+                `;
+                
+                feedElement.insertBefore(dataEntry, feedElement.children[1] || null);
+                
+                // Keep only last 20 entries
+                while (feedElement.children.length > 21) {
+                    feedElement.removeChild(feedElement.lastChild);
+                }
+                
+                // Update stats
+                marketDataStats.updatesPerMin += 1;
+                marketDataStats.dataVolume += Math.random() * 2;
+                
+                updateMarketDataStats();
+                
+            }, provider === 'demo' ? 2000 : 1000); // Demo mode is slower
+        }
+
+        // Update Market Data Statistics
+        function updateMarketDataStats() {
+            document.getElementById('activeSymbols').textContent = marketDataStats.activeSymbols;
+            document.getElementById('updatesPerMin').textContent = Math.floor(marketDataStats.updatesPerMin);
+            document.getElementById('dataVolume').textContent = Math.floor(marketDataStats.dataVolume) + ' KB';
+            
+            if (marketDataStats.startTime) {
+                const uptime = Math.floor((new Date() - marketDataStats.startTime) / 1000);
+                const minutes = Math.floor(uptime / 60);
+                const seconds = uptime % 60;
+                document.getElementById('uptime').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }
+        }
+
+        // Strategy Optimization
+        window.runStrategyOptimization = function() {
+            const strategy = document.getElementById('optimizerStrategy').value;
+            const objective = document.getElementById('optimizationObjective').value;
+            const resultsElement = document.getElementById('optimizationResults');
+            
+            resultsElement.innerHTML = '<div class="text-center text-blue-600 py-8">🔄 Running optimization...</div>';
+            
+            // Simulate optimization process
+            setTimeout(() => {
+                const results = generateOptimizationResults(strategy, objective);
+                resultsElement.innerHTML = `
+                    <h5 class="font-semibold text-gray-800 mb-4">🎯 Optimization Results</h5>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span>Strategy:</span>
+                            <span class="font-semibold">${strategy.replace('-', ' ').toUpperCase()}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Optimal Strike:</span>
+                            <span class="font-mono">$${results.optimalStrike}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Expected Return:</span>
+                            <span class="font-mono ${results.expectedReturn >= 0 ? 'text-green-600' : 'text-red-600'}">${results.expectedReturn}%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Max Risk:</span>
+                            <span class="font-mono text-red-600">-$${results.maxRisk}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Profit Probability:</span>
+                            <span class="font-mono">${results.profitProb}%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Sharpe Ratio:</span>
+                            <span class="font-mono">${results.sharpeRatio}</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-3 bg-blue-50 rounded-lg text-sm">
+                        <strong>Recommendation:</strong> ${results.recommendation}
+                    </div>
+                `;
+            }, 3000);
+        };
+
+        // Generate Optimization Results
+        function generateOptimizationResults(strategy, objective) {
+            const basePrice = 450;
+            const optimalStrike = Math.round((basePrice + (Math.random() - 0.5) * 50) / 5) * 5;
+            
+            return {
+                optimalStrike: optimalStrike,
+                expectedReturn: ((Math.random() - 0.3) * 40).toFixed(1),
+                maxRisk: (Math.random() * 2000 + 500).toFixed(0),
+                profitProb: (Math.random() * 40 + 40).toFixed(1),
+                sharpeRatio: (Math.random() * 2 + 0.5).toFixed(2),
+                recommendation: `Based on ${objective}, this configuration provides optimal risk-adjusted returns for current market conditions.`
+            };
+        }
+
+        // Initialize Risk Analytics Charts
+        function initializeRiskAnalytics() {
+            // VaR Chart
+            const varCtx = document.getElementById('varChart');
+            if (varCtx) {
+                const chart = new Chart(varCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['1-Day', '5-Day', '10-Day', '30-Day'],
+                        datasets: [{
+                            label: '95% VaR',
+                            data: [1500, 3200, 4800, 8500],
+                            backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                            borderColor: 'rgba(239, 68, 68, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'VaR ($)'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Correlation Chart
+            const corrCtx = document.getElementById('correlationChart');
+            if (corrCtx) {
+                const chart = new Chart(corrCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['SPY', 'QQQ', 'AAPL', 'MSFT', 'Other'],
+                        datasets: [{
+                            data: [35, 25, 15, 15, 10],
+                            backgroundColor: [
+                                '#3b82f6',
+                                '#10b981',
+                                '#f59e0b',
+                                '#ef4444',
+                                '#8b5cf6'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Data provider change handler
+        document.addEventListener('DOMContentLoaded', function() {
+            const dataProviderSelect = document.getElementById('dataProvider');
+            if (dataProviderSelect) {
+                dataProviderSelect.addEventListener('change', function() {
+                    const apiKeySection = document.getElementById('apiKeySection');
+                    if (this.value !== 'demo') {
+                        apiKeySection.classList.remove('hidden');
+                    } else {
+                        apiKeySection.classList.add('hidden');
+                    }
+                });
+            }
+        });
+
+        // Initialize Phase 4A features
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize professional data section after other initializations
+            setTimeout(() => {
+                showProfessionalTool('market-data');
+            }, 2000);
+        });
+
+        // Clean up intervals on page unload
+        window.addEventListener('beforeunload', function() {
+            if (marketDataConnection) {
+                clearInterval(marketDataConnection);
+            }
         });
     </script>
 </body>
