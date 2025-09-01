@@ -6,6 +6,10 @@
 
 🌐 **Live at**: `[mywebsite.com]/options` *(coming soon)*
 
+## 📋 Note on Scope & Validation
+
+This repository is an educational toolkit with working implementations of five pricing models. Some documentation examples and reports are illustrative; validation scripts are provided on a small sample dataset. Monte Carlo control variate is basic and intended for demonstration, not production calibration. Jump diffusion parameters use academic defaults rather than market-calibrated values.
+
 ## 🎯 Project Vision
 
 Transforming complex options mathematics into an **interactive learning experience** through:
@@ -23,14 +27,14 @@ Built on a **production-ready pricing library** featuring:
 - 🎯 **5 Pricing Models**: Binomial, Trinomial, Black-Scholes, Jump Diffusion, Monte Carlo
 - 🏆 **Best-in-class accuracy**: Trinomial model 16.4% more accurate than binomial
 - 🔍 **Complete Greeks calculation** for all models with numerical differentiation
-- 💡 **Implied volatility solver** using Newton-Raphson method
+- 💡 **Implied volatility solver** using bisection method
 - 📈 **Monte Carlo simulation** with variance reduction and adaptive sampling
 - 💥 **Jump diffusion modeling** for market crashes and price gaps
 - 💰 **Real dividend yield database** (70+ major stocks)
-- ✅ **Extensively validated**: 671K real options + 6 market scenarios + accuracy study
+- ✅ **Validation scaffolding**: Sample dataset with validation framework (full 671K dataset available via download)
 - 🚀 **Zero dependencies** - pure vanilla JavaScript
 - 🌐 **Universal** - works in browser and Node.js
-- 📱 **Modern ES6+ modules** with proper TypeScript-style JSDoc
+- 📱 **Modern ES6+ modules** with comprehensive unit tests
 - 🔷 **Full TypeScript support** with comprehensive type definitions
 
 ## 🎓 Educational Platform Features (Coming Soon)
@@ -345,14 +349,13 @@ console.log(OPTIMAL_PARAMETERS);
 ```
 
 **Validation Results:**
-- ✅ **5.0% average IV difference** vs market (expected model variance)
-- ✅ **85% of options within 5% IV difference**  
-- ✅ **0.52% error in self-consistency tests**
-- ✅ **Trinomial model 16.4% more accurate** than binomial baseline
-- ✅ **95% numerical stability** across extreme parameter ranges
-- ✅ **6 major market scenarios tested** (COVID crash, tech bubble, etc.)
-- ✅ **Comprehensive model accuracy study** with production recommendations
-- ✅ **Mathematically validated** against real market data
+- ✅ **Comprehensive test framework** with validation scaffolding
+- ✅ **Model accuracy assessment** comparing 5 pricing algorithms
+- ✅ **Trinomial model consistently more accurate** than binomial baseline
+- ✅ **Numerical stability testing** across parameter ranges
+- ✅ **Academic test cases** from finance textbooks validated
+- ✅ **Real market data validation** framework (sample dataset included)
+- ✅ **Production-ready algorithms** with educational focus
 
 ## 🏗️ Project Structure
 
@@ -396,7 +399,7 @@ binomial-options/
 
 ```bash
 # Run comprehensive test suite
-npm test                                # 44 unit tests
+npm test                                # Unit tests using Node's test runner
 
 # Run market validation
 npm run validate                        # 671K real options
@@ -411,10 +414,10 @@ node examples/real-market-validation.js     # Market scenarios
 ```
 
 The library includes:
-- **44 comprehensive unit tests** covering all models and edge cases
+- **Comprehensive unit tests** covering all models and edge cases using Node's test runner
 - **Academic test cases** from finance textbooks
-- **Real market validation** against 671K options + 6 market scenarios
-- **Model accuracy assessment** with comprehensive comparison study
+- **Real market validation scaffolding** with sample dataset (full dataset available via download)
+- **Model accuracy assessment** with comparative analysis framework
 - **Greeks accuracy tests** for all pricing models
 - **Edge case scenarios** and numerical stability testing
 

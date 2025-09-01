@@ -64,26 +64,27 @@ export function monteCarloPrice(params) {
     
     // Monte Carlo simulation loop
     for (let i = 0; i < actualSims; i++) {
-        // Generate one path
-        const finalPrice = simulateStockPath(stockPrice, drift, diffusion, timeSteps, rng);
-        const payoff = calculatePayoff(finalPrice, strikePrice, optionType);
-        payoffs.push(payoff);
-        
-        // Control variate (Black-Scholes analytical price for same path)
-        if (useControlVariate) {
-            const controlPayoff = calculateControlVariatePayoff(finalPrice, params);
-            controlPayoffs.push(controlPayoff);
-        }
-        
-        // Antithetic path
         if (useAntithetic) {
-            const antitheticPrice = simulateAntitheticPath(stockPrice, drift, diffusion, timeSteps, rng);
-            const antitheticPayoff = calculatePayoff(antitheticPrice, strikePrice, optionType);
-            payoffs.push(antitheticPayoff);
+            // Generate paired paths
+            const [pA, pB] = simulatePairedPaths(stockPrice, drift, diffusion, timeSteps, rng);
+            payoffs.push(calculatePayoff(pA, strikePrice, optionType));
+            payoffs.push(calculatePayoff(pB, strikePrice, optionType));
             
+            // Control variate for both paths
             if (useControlVariate) {
-                const antitheticControlPayoff = calculateControlVariatePayoff(antitheticPrice, params);
-                controlPayoffs.push(antitheticControlPayoff);
+                controlPayoffs.push(calculateControlVariatePayoff(pA, params));
+                controlPayoffs.push(calculateControlVariatePayoff(pB, params));
+            }
+        } else {
+            // Generate single path
+            const finalPrice = simulateStockPath(stockPrice, drift, diffusion, timeSteps, rng);
+            const payoff = calculatePayoff(finalPrice, strikePrice, optionType);
+            payoffs.push(payoff);
+            
+            // Control variate
+            if (useControlVariate) {
+                const controlPayoff = calculateControlVariatePayoff(finalPrice, params);
+                controlPayoffs.push(controlPayoff);
             }
         }
     }
@@ -193,20 +194,19 @@ function simulateStockPath(initialPrice, drift, diffusion, timeSteps, rng) {
 }
 
 /**
- * Simulate antithetic path (using -Z instead of Z)
+ * Simulate paired paths (original and antithetic) for variance reduction
  */
-function simulateAntitheticPath(initialPrice, drift, diffusion, timeSteps, rng) {
-    let price = initialPrice;
+function simulatePairedPaths(initialPrice, drift, diffusion, timeSteps, rng) {
+    let p1 = initialPrice;
+    let p2 = initialPrice;
     
-    // Use the last generated normals but with opposite sign
-    const normals = rng.getLastNormals(timeSteps);
-    
-    for (let step = 0; step < timeSteps; step++) {
-        const z = -normals[step]; // Antithetic variable
-        price *= Math.exp(drift + diffusion * z);
+    for (let t = 0; t < timeSteps; t++) {
+        const z = rng.normal();
+        p1 *= Math.exp(drift + diffusion * z);
+        p2 *= Math.exp(drift - diffusion * z); // antithetic
     }
     
-    return price;
+    return [p1, p2];
 }
 
 /**
@@ -221,13 +221,12 @@ function calculatePayoff(stockPrice, strikePrice, optionType) {
 }
 
 /**
- * Calculate control variate payoff (Black-Scholes analytical)
+ * Calculate control variate payoff (terminal stock price as control)
  */
-function calculateControlVariatePayoff(stockPrice, params) {
-    // This would be the Black-Scholes price for the final stock price
-    // For simplicity, we'll use a basic approximation
-    const { strikePrice, optionType } = params;
-    return calculatePayoff(stockPrice, strikePrice, optionType);
+function calculateControlVariatePayoff(stockPriceT, { stockPrice, dividendYield = 0, timeToExpiry, riskFreeRate }) {
+    // Control variable C = e^{-rT} S_T, E[C] = S0 e^{-qT}
+    const discountFactor = Math.exp(-riskFreeRate * timeToExpiry);
+    return discountFactor * stockPriceT;
 }
 
 /**
@@ -235,42 +234,36 @@ function calculateControlVariatePayoff(stockPrice, params) {
  */
 function applyControlVariate(payoffs, controlPayoffs, params) {
     const n = payoffs.length;
+    const meanX = payoffs.reduce((a, b) => a + b, 0) / n;
+    const meanC = controlPayoffs.reduce((a, b) => a + b, 0) / n;
     
-    // Calculate means
-    const meanPayoff = payoffs.reduce((sum, p) => sum + p, 0) / n;
-    const meanControl = controlPayoffs.reduce((sum, p) => sum + p, 0) / n;
-    
-    // Calculate covariance and control variance
-    let covariance = 0;
-    let controlVariance = 0;
+    let cov = 0;
+    let varC = 0;
     
     for (let i = 0; i < n; i++) {
-        const payoffDiff = payoffs[i] - meanPayoff;
-        const controlDiff = controlPayoffs[i] - meanControl;
-        covariance += payoffDiff * controlDiff;
-        controlVariance += controlDiff * controlDiff;
+        const dx = payoffs[i] - meanX;
+        const dc = controlPayoffs[i] - meanC;
+        cov += dx * dc;
+        varC += dc * dc;
     }
     
-    covariance /= (n - 1);
-    controlVariance /= (n - 1);
+    cov /= (n - 1);
+    varC /= (n - 1);
     
-    // Optimal control coefficient
-    const beta = controlVariance > 0 ? covariance / controlVariance : 0;
+    const beta = varC > 0 ? cov / varC : 0;
     
-    // Control variate estimate
-    const theoreticalControlMean = meanControl; // Simplified
-    const controlVariateEstimate = meanPayoff - beta * (meanControl - theoreticalControlMean);
+    // Known E[C] = S0 * e^{-qT}
+    const expectedC = params.stockPrice * Math.exp(-(params.dividendYield || 0) * params.timeToExpiry);
+    const adjMean = meanX - beta * (meanC - expectedC);
     
-    // Calculate variance of control variate estimator
-    const payoffVariance = payoffs.reduce((sum, p) => sum + (p - meanPayoff) ** 2, 0) / (n - 1);
-    const correlationSquared = covariance ** 2 / (payoffVariance * controlVariance);
-    const cvVariance = payoffVariance * (1 - correlationSquared) / n;
-    
-    const discountFactor = Math.exp(-params.riskFreeRate * params.timeToExpiry);
+    // Variance of adjusted estimator
+    const varX = payoffs.reduce((s, p) => s + (p - meanX) ** 2, 0) / (n - 1);
+    const corr2 = varC > 0 && varX > 0 ? (cov * cov) / (varX * varC) : 0;
+    const adjVar = (varX * (1 - Math.min(1, Math.max(0, corr2)))) / n;
     
     return {
-        price: discountFactor * controlVariateEstimate,
-        variance: (discountFactor ** 2) * cvVariance
+        price: adjMean, // Already discounted in control variate calculation
+        variance: adjVar
     };
 }
 
@@ -323,8 +316,9 @@ class SimpleRNG {
         
         this.hasSpare = true;
         
-        const u = this.random();
-        const v = this.random();
+        // Clamp u away from 0 to avoid log(0)
+        const u = Math.max(1e-12, this.random());
+        const v = Math.max(1e-12, this.random());
         const mag = Math.sqrt(-2 * Math.log(u));
         const z0 = mag * Math.cos(2 * Math.PI * v);
         const z1 = mag * Math.sin(2 * Math.PI * v);
@@ -373,6 +367,37 @@ function validateMonteCarloParams(params) {
 }
 
 /**
+ * Helper function to generate batch of discounted payoffs
+ */
+function monteBatch(params, batchSize, seed) {
+    const result = monteCarloPrice({ ...params, simulations: batchSize, seed });
+    // Extract actual payoffs from the batch
+    // For now, simulate the batch payoffs based on the result
+    const payoffs = [];
+    const discountFactor = Math.exp(-params.riskFreeRate * params.timeToExpiry);
+    
+    // Generate batch using same logic as main function
+    const rng = new SimpleRNG(seed);
+    const dt = params.timeToExpiry / (params.timeSteps || 1);
+    const drift = (params.riskFreeRate - (params.dividendYield || 0) - 0.5 * params.volatility * params.volatility) * dt;
+    const diffusion = params.volatility * Math.sqrt(dt);
+    const actualSims = params.useAntithetic ? Math.floor(batchSize / 2) : batchSize;
+    
+    for (let i = 0; i < actualSims; i++) {
+        if (params.useAntithetic) {
+            const [pA, pB] = simulatePairedPaths(params.stockPrice, drift, diffusion, params.timeSteps || 1, rng);
+            payoffs.push(discountFactor * calculatePayoff(pA, params.strikePrice, params.optionType));
+            payoffs.push(discountFactor * calculatePayoff(pB, params.strikePrice, params.optionType));
+        } else {
+            const finalPrice = simulateStockPath(params.stockPrice, drift, diffusion, params.timeSteps || 1, rng);
+            payoffs.push(discountFactor * calculatePayoff(finalPrice, params.strikePrice, params.optionType));
+        }
+    }
+    
+    return payoffs;
+}
+
+/**
  * Adaptive Monte Carlo pricing with convergence criteria
  * 
  * @param {Object} params - Same as monteCarloPrice
@@ -382,41 +407,69 @@ function validateMonteCarloParams(params) {
  * @returns {Object} Pricing results with convergence information
  */
 export function adaptiveMonteCarloPrice(params, targetError = 0.01, maxSimulations = 1000000, batchSize = 10000) {
-    let totalSimulations = 0;
-    let allPayoffs = [];
-    const discountFactor = Math.exp(-params.riskFreeRate * params.timeToExpiry);
+    let n = 0;
+    let sum = 0;
+    let sumsq = 0;
+    const seed0 = params.seed || Math.floor(Math.random() * 1e9);
     
-    while (totalSimulations < maxSimulations) {
-        // Run batch
-        const batchResult = monteCarloPrice({
-            ...params,
-            simulations: batchSize,
-            seed: params.seed ? params.seed + totalSimulations : undefined
-        });
+    while (n < maxSimulations) {
+        const batch = monteBatch(params, batchSize, seed0 + n);
+        for (const x of batch) {
+            n++;
+            sum += x;
+            sumsq += x * x;
+        }
         
-        totalSimulations += batchSize;
+        const mean = sum / n;
+        const varHat = Math.max(0, (sumsq / n) - mean * mean);
+        const se = Math.sqrt(varHat / n);
         
-        // Check convergence
-        if (batchResult.standardError <= targetError) {
+        if (se <= targetError) {
             return {
-                ...batchResult,
+                price: mean,
+                standardError: se,
+                confidenceInterval: {
+                    lower: mean - 1.96 * se,
+                    upper: mean + 1.96 * se,
+                    width: 3.92 * se
+                },
+                statistics: {
+                    simulations: n,
+                    variance: varHat,
+                    useAntithetic: !!params.useAntithetic,
+                    useControlVariate: !!params.useControlVariate,
+                    convergenceRate: se * Math.sqrt(n),
+                    efficiency: varHat > 0 ? 1 / (se * se) : 0
+                },
                 converged: true,
-                totalSimulations,
+                totalSimulations: n,
                 targetError
             };
         }
     }
     
-    // Final result if not converged
-    const finalResult = monteCarloPrice({
-        ...params,
-        simulations: totalSimulations
-    });
+    const mean = sum / n;
+    const varHat = Math.max(0, (sumsq / n) - mean * mean);
+    const se = Math.sqrt(varHat / n);
     
     return {
-        ...finalResult,
+        price: mean,
+        standardError: se,
+        confidenceInterval: {
+            lower: mean - 1.96 * se,
+            upper: mean + 1.96 * se,
+            width: 3.92 * se
+        },
+        statistics: {
+            simulations: n,
+            variance: varHat,
+            useAntithetic: !!params.useAntithetic,
+            useControlVariate: !!params.useControlVariate,
+            convergenceRate: se * Math.sqrt(n),
+            efficiency: varHat > 0 ? 1 / (se * se) : 0
+        },
         converged: false,
-        totalSimulations,
+        totalSimulations: n,
         targetError
     };
 }

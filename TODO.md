@@ -1,5 +1,179 @@
 # TODO: Options Education Platform
 
+## Hardening Checklist For Publication (Actionable, Specific)
+
+This list aligns the repo with what’s actually implemented, fixes correctness issues, and gets you a polished, credible portfolio artifact. Each item is scoped and testable.
+
+1) Monte Carlo correctness and variance reduction
+- Clamp Box–Muller to avoid log(0):
+  - File: `src/core/montecarlo.js`
+  - Change inside `SimpleRNG.normal()`:
+    ```js
+    // Before
+    const u = this.random();
+    const v = this.random();
+    // After (clamp u away from 0)
+    const u = Math.max(1e-12, this.random());
+    const v = Math.max(1e-12, this.random());
+    ```
+- Replace antithetic path hack with paired simulation per step (no reliance on lastNormals):
+  - Replace current antithetic usage with a paired simulator:
+    ```js
+    function simulatePairedPaths(initialPrice, drift, diffusion, timeSteps, rng) {
+      let p1 = initialPrice, p2 = initialPrice;
+      for (let t = 0; t < timeSteps; t++) {
+        const z = rng.normal();
+        p1 *= Math.exp(drift + diffusion * z);
+        p2 *= Math.exp(drift - diffusion * z); // antithetic
+      }
+      return [p1, p2];
+    }
+    // In the main loop
+    const [pA, pB] = simulatePairedPaths(stockPrice, drift, diffusion, timeSteps, rng);
+    payoffs.push(calculatePayoff(pA, strikePrice, optionType));
+    if (useAntithetic) payoffs.push(calculatePayoff(pB, strikePrice, optionType));
+    ```
+- Implement a real control variate (terminal price as control, known expectation):
+  - Replace `calculateControlVariatePayoff` and `applyControlVariate` to use `discountFactor * S_T` as control with known mean `S0 * exp(-qT)`:
+    ```js
+    // Replace calculateControlVariatePayoff
+    function calculateControlVariatePayoff(stockPriceT, { stockPrice, dividendYield = 0, timeToExpiry, riskFreeRate }) {
+      // Control variable C = e^{-rT} S_T, E[C] = S0 e^{-qT}
+      const discountFactor = Math.exp(-riskFreeRate * timeToExpiry);
+      return discountFactor * stockPriceT;
+    }
+
+    function applyControlVariate(payoffs, controlPayoffs, params) {
+      const n = payoffs.length;
+      const meanX = payoffs.reduce((a,b)=>a+b,0)/n;
+      const meanC = controlPayoffs.reduce((a,b)=>a+b,0)/n;
+      let cov = 0, varC = 0;
+      for (let i=0;i<n;i++){ const dx=payoffs[i]-meanX, dc=controlPayoffs[i]-meanC; cov+=dx*dc; varC+=dc*dc; }
+      cov/= (n-1); varC/= (n-1);
+      const beta = varC>0 ? cov/varC : 0;
+      // Known E[C] = S0 * e^{-qT}
+      const expectedC = params.stockPrice * Math.exp(-(params.dividendYield||0) * params.timeToExpiry);
+      const adjMean = meanX - beta * (meanC - expectedC);
+      // Variance of adjusted estimator
+      const varX = payoffs.reduce((s,p)=>s+(p-meanX)**2,0)/(n-1);
+      const corr2 = varC>0 && varX>0 ? (cov*cov)/(varX*varC) : 0;
+      const adjVar = (varX * (1 - Math.min(1, Math.max(0, corr2)))) / n;
+      return { price: adjMean, variance: adjVar };
+    }
+    ```
+  - Note: We no longer multiply by `discountFactor` again in `applyControlVariate` because both X and C are already discounted.
+- Fix adaptive Monte Carlo to accumulate across batches (ΣX, ΣX², n):
+  - Replace `adaptiveMonteCarloPrice` loop with accumulation:
+    ```js
+    export function adaptiveMonteCarloPrice(params, targetError=0.01, maxSimulations=1_000_000, batchSize=10_000){
+      let n=0, sum=0, sumsq=0;
+      const seed0 = params.seed || Math.floor(Math.random()*1e9);
+      while(n < maxSimulations){
+        const batch = monteBatch(params, batchSize, seed0 + n); // implement to return array of discounted payoffs
+        for (const x of batch){ n++; sum+=x; sumsq+=x*x; }
+        const mean = sum/n; const varHat = Math.max(0, (sumsq/n) - mean*mean);
+        const se = Math.sqrt(varHat/n);
+        if (se <= targetError) return { price: mean, standardError: se, confidenceInterval: { lower: mean-1.96*se, upper: mean+1.96*se, width: 3.92*se }, statistics: { simulations: n, variance: varHat, useAntithetic: !!params.useAntithetic, useControlVariate: !!params.useControlVariate, convergenceRate: (se*Math.sqrt(n)), efficiency: varHat>0 ? 1/(se*se) : 0 }, converged: true, totalSimulations: n, targetError };
+      }
+      const mean = sum/n; const varHat = Math.max(0, (sumsq/n) - mean*mean); const se = Math.sqrt(varHat/n);
+      return { price: mean, standardError: se, confidenceInterval: { lower: mean-1.96*se, upper: mean+1.96*se, width: 3.92*se }, statistics: { simulations: n, variance: varHat, useAntithetic: !!params.useAntithetic, useControlVariate: !!params.useControlVariate, convergenceRate: (se*Math.sqrt(n)), efficiency: varHat>0 ? 1/(se*se) : 0 }, converged: false, totalSimulations: n, targetError };
+    }
+    ```
+
+2) Align README/docs with reality (truth changes)
+- File: `README.md`
+  - Replace “Newton–Raphson IV” with “Bisection IV” in features and API docs.
+  - Replace “44 unit tests” with “unit tests using Node’s test runner”.
+  - Rephrase “671K real options validation” to “validation scaffolding with sample dataset; full dataset available via download”.
+  - Add a short “Credibility & Limitations” section stating which features are illustrative (jump defaults not calibrated, MC CV is basic, etc.).
+- File: `docs/MODEL_ACCURACY_REPORT.md`
+  - Add a banner note: “Illustrative report; scripts to reproduce are planned.”
+
+3) Repo hygiene and size
+- Move `market-data-clean.json` out of the repo or into Git LFS; keep a 100‑row sample:
+  - Add `.gitattributes`:
+    ```gitattributes
+    market-data-clean.json filter=lfs diff=lfs merge=lfs -text
+    ```
+  - Or add to `.gitignore` and commit a smaller `market-data-sample.json` for examples.
+- Remove/retire legacy CJS files referencing `index_fixed.js`/`binomial-options.js` or migrate them to import from `lib/index.js`. For example, change in `tests/validate-real-market.cjs`:
+  ```js
+  // Before
+  const BinomialOptions = require('./binomial-options.js');
+  // After (use current library via dynamic import)
+  const { binomialPrice, calculateGreeks } = await import('../lib/index.js');
+  ```
+- Package scripts: `package.json` references `scripts/generate-docs.js` (missing). Either add the script or remove the command to avoid broken scripts.
+
+4) API and behavior consistency
+- `Option.summary()` should compute `timeValue` from the recommended displayed price (pick Trinomial 50 steps) and memoize repeated prices:
+  - File: `src/models/option.js`
+  - Suggested change inside `summary()`:
+    ```js
+    const priceTri = this.trinomialPrice();
+    const intrinsic = this.intrinsicValue();
+    return {
+      // ...
+      pricing: {
+        binomial: this.binomialPrice(),
+        trinomial: priceTri,
+        blackScholes: this.blackScholesPrice(),
+        jumpDiffusion: this.jumpDiffusionPrice(),
+        monteCarlo: this.monteCarloPrice({ simulations: 50000 }).price,
+        intrinsic,
+        timeValue: priceTri - intrinsic
+      },
+      // ...
+    };
+    ```
+- Binomial risk‑neutral probability error message: include parameter snapshot to ease debugging:
+  - File: `src/core/binomial.js`
+  - Replace throw with:
+    ```js
+    if (p < 0 || p > 1) {
+      throw new Error(`Invalid risk-neutral probability p=${p.toFixed(6)} with dt=${dt.toExponential()}, u=${u.toFixed(6)}, d=${d.toFixed(6)}. Check (r−q), σ, or steps.`);
+    }
+    ```
+
+5) Types and name mismatches
+- `DividendCategory` type vs. implementation uses `'reits'` (plural) in `getDividendsByCategory`:
+  - File: `lib/index.d.ts`
+  - Change:
+    ```ts
+    export type DividendCategory = 'tech' | 'finance' | 'healthcare' | 'consumer' | 'industrial' | 'reit' | 'utilities' | 'energy';
+    ```
+    to
+    ```ts
+    export type DividendCategory = 'tech' | 'finance' | 'healthcare' | 'consumer' | 'industrial' | 'reits' | 'utilities' | 'energy';
+    ```
+  - Alternatively, update `src/utils/dividends.js` to accept `'reit'` and map to `'reits'` internally. Pick one and keep docs/types in sync.
+
+6) Tests you can add to prove fixes
+- MC SE reduction: run MC with/without control variate on the same seed and assert `SE_CV < SE_plain` by a factor (e.g., < 0.9x) for ATM call.
+- Adaptive MC accumulation: generate price with `targetError=0.01` and assert `converged===true` and `statistics.simulations` increases across batches.
+- BS regression values: add 3–5 known analytical prices and assert within 1e‑4.
+- Jump diffusion λ→0: assert JD price ≈ BS price within a small tolerance.
+- Types: compile a tiny TS file importing `DividendCategory` and `getDividendsByCategory('reits')` to ensure no type error.
+
+7) README “Credibility” block (add near the top)
+- Suggested text:
+  ```md
+  Note on Scope & Validation
+  This repo is an educational toolkit with working implementations of five models. Some documentation examples and reports are illustrative; validation scripts are provided on a small sample dataset. Monte Carlo control variate is basic and intended for demonstration, not production calibration.
+  ```
+
+8) Publish‑ready demo page (single, tight scope)
+- Ship one SPA page under `public/` that:
+  - Accepts S, K, T(days), r, σ, q, type, style
+  - Shows Trinomial and Black–Scholes prices + Greeks
+  - Displays a payoff chart
+  - Includes a “steps” slider (25/50/100) and a small “model agreement” indicator (|Tri − BS|)
+- Keep it dependency‑light (Chart.js is fine). Link to it from README.
+
+---
+
+Completion criteria: each bullet above either changes specific lines in the files named or adds tests/samples that make the change verifiable. Prioritize (1) MC fixes, (2) README truth alignment, (3) repo size hygiene, then (4) types/tests, (5) the demo page.
+
 ## 🎯 New Direction: Interactive Educational Website
 
 Transforming the robust JavaScript options pricing library into an **interactive educational platform** that helps users visualize and understand options Greeks and pricing algorithms. The website will live at `[mywebsite.com]/options`.
