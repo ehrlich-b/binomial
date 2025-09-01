@@ -20,7 +20,7 @@ const testFile = join(__dirname, 'unit.test.js');
 
 const testProcess = spawn('node', ['--test', '--test-reporter=spec', testFile], {
     stdio: 'inherit',
-    env: { ...process.env, NODE_OPTIONS: '--experimental-test-coverage' }
+    env: { ...process.env }  // Remove NODE_OPTIONS conflict
 });
 
 testProcess.on('close', (code) => {

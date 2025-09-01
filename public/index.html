@@ -4142,8 +4142,8 @@
             });
         }
         
-        // Algorithm switching functionality
-        function showAlgorithm(algorithm) {
+        // Algorithm switching functionality - Make globally accessible
+        window.showAlgorithm = function(algorithm) {
             // Hide all algorithm content
             const contents = document.querySelectorAll('.algorithm-content');
             contents.forEach(content => {
@@ -4183,8 +4183,8 @@
             return colors[algorithm] || 'bg-blue-700';
         }
         
-        // Binomial Tree Animation
-        function animateBinomialTree() {
+        // Binomial Tree Animation - Make globally accessible
+        window.animateBinomialTree = function() {
             const steps = parseInt(document.getElementById('binomialSteps').value);
             const speed = parseInt(document.getElementById('animationSpeed').value);
             const canvas = document.getElementById('treeCanvas');
@@ -4240,7 +4240,7 @@
         }
 
         // Trinomial Tree Animation
-        function animateTrinomialTree() {
+        window.animateTrinomialTree = function() {
             const steps = parseInt(document.getElementById('trinomialSteps').value);
             const speed = parseInt(document.getElementById('trinomialSpeed').value);
             const canvas = document.getElementById('trinomialCanvas');
@@ -4396,7 +4396,7 @@
             return html;
         }
         
-        function resetTrinomialAnimation() {
+        window.resetTrinomialAnimation = function() {
             const canvas = document.getElementById('trinomialCanvas');
             const stepDisplay = document.getElementById('trinomialStepDisplay');
             
@@ -4510,7 +4510,7 @@
         }
         
         // Monte Carlo Animation
-        function animateMonteCarlo() {
+        window.animateMonteCarlo = function() {
             const totalPaths = parseInt(document.getElementById('mcPaths').value);
             const showPaths = parseInt(document.getElementById('mcShowPaths').value);
             const canvas = document.getElementById('mcCanvas');
@@ -4641,7 +4641,7 @@
         }
         
         // Black-Scholes Animation
-        function animateBlackScholes() {
+        window.animateBlackScholes = function() {
             const steps = ['bsStep1', 'bsStep2', 'bsStep3', 'bsStep4'];
             const calculation = document.getElementById('bsLiveCalc');
             
@@ -4699,7 +4699,7 @@
         let jumpPaths = [];
         let jumpStats = { jumps: 0, totalJumpSize: 0 };
 
-        function animateJumpDiffusion() {
+        window.animateJumpDiffusion = function() {
             const intensity = parseFloat(document.getElementById('jumpIntensity').value);
             const jumpMean = parseFloat(document.getElementById('jumpMean').value);
             const jumpVol = parseFloat(document.getElementById('jumpVol').value);
@@ -4712,7 +4712,7 @@
             // Get current option parameters
             const stockPrice = parseFloat(document.getElementById('stockPrice').value) || 100;
             const strikePrice = parseFloat(document.getElementById('strikePrice').value) || 105;
-            const timeToExpiry = parseFloat(document.getElementById('timeToExpiry').value) || 30;
+            const timeToExpiry = parseFloat(document.getElementById('daysToExpiry').value) || 30;
             const riskFreeRate = parseFloat(document.getElementById('riskFreeRate').value) || 4;
             const volatility = parseFloat(document.getElementById('volatility').value) || 25;
             
@@ -5517,7 +5517,7 @@
             }
         };
 
-        function showTutorial(tutorialType) {
+        window.showTutorial = function(tutorialType) {
             // Hide all tutorial content
             const tutorials = document.querySelectorAll('.tutorial-content');
             tutorials.forEach(tutorial => {
@@ -5578,7 +5578,7 @@
             return colors[tutorialType] || 'bg-purple-700';
         }
         
-        function nextTutorialStep() {
+        window.nextTutorialStep = function() {
             const tutorial = tutorialContent[currentTutorial];
             if (currentTutorialStep < tutorial.totalSteps - 1) {
                 currentTutorialStep++;
@@ -5623,7 +5623,8 @@
             nextBtn.textContent = currentTutorialStep === tutorial.totalSteps - 1 ? "Complete!" : "Next →";
             if (currentTutorialStep === tutorial.totalSteps - 1) {
                 nextBtn.onclick = function() {
-                    alert("🎉 Congratulations! You've completed the Greeks tutorial. Try exploring the other sections of the platform!");
+                    // Show completion message in the UI instead of alert
+                    document.getElementById('tutorialContent').innerHTML = '<div class="bg-green-50 border border-green-200 rounded-lg p-6 text-center"><div class="text-green-800 text-xl font-semibold mb-2">🎉 Tutorial Complete!</div><p class="text-green-700">Congratulations! You\'ve mastered the Greeks. Try the other tutorials or explore the platform.</p></div>';
                 };
             } else {
                 nextBtn.onclick = nextTutorialStep;
@@ -7261,7 +7262,7 @@
 
         let currentOptionsBasicsStep = 0;
 
-        function nextOptionsBasicsStep() {
+        window.nextOptionsBasicsStep = function() {
             const tutorial = tutorialContent['options-basics'];
             if (currentOptionsBasicsStep < tutorial.totalSteps - 1) {
                 currentOptionsBasicsStep++;
@@ -7269,7 +7270,7 @@
             }
         }
         
-        function previousOptionsBasicsStep() {
+        window.previousOptionsBasicsStep = function() {
             if (currentOptionsBasicsStep > 0) {
                 currentOptionsBasicsStep--;
                 updateOptionsBasicsStep();
@@ -7309,7 +7310,8 @@
             nextBtn.textContent = currentOptionsBasicsStep === tutorial.totalSteps - 1 ? "Complete!" : "Next →";
             if (currentOptionsBasicsStep === tutorial.totalSteps - 1) {
                 nextBtn.onclick = function() {
-                    alert("🎉 Excellent! You've completed the Options Basics tutorial. You now understand the fundamentals of options trading. Try the other tutorials to deepen your knowledge!");
+                    // Show completion message in the UI
+                    document.getElementById('optionsBasicsStep').innerHTML = '<div class="bg-green-50 border border-green-200 rounded-lg p-6 text-center"><div class="text-green-800 text-xl font-semibold mb-2">🎉 Tutorial Complete!</div><p class="text-green-700">Excellent! You now understand options fundamentals.</p></div>';
                 };
             } else {
                 nextBtn.onclick = nextOptionsBasicsStep;
@@ -7491,7 +7493,7 @@
 
         let currentPricingModelsStep = 0;
 
-        function nextPricingModelsStep() {
+        window.nextPricingModelsStep = function() {
             const tutorial = tutorialContent['pricing-models'];
             if (currentPricingModelsStep < tutorial.totalSteps - 1) {
                 currentPricingModelsStep++;
@@ -7499,7 +7501,7 @@
             }
         }
 
-        function previousPricingModelsStep() {
+        window.previousPricingModelsStep = function() {
             if (currentPricingModelsStep > 0) {
                 currentPricingModelsStep--;
                 updatePricingModelsStep();
@@ -7536,7 +7538,8 @@
             nextBtn.textContent = currentPricingModelsStep === tutorial.totalSteps - 1 ? "Complete!" : "Next →";
             if (currentPricingModelsStep === tutorial.totalSteps - 1) {
                 nextBtn.onclick = function() {
-                    alert("🎉 Excellent! You've completed the Pricing Models tutorial. You now understand the different models and when to use each one. This knowledge will help you make better trading decisions!");
+                    // Show completion message in the UI
+                    document.getElementById('pricingModelsStep').innerHTML = '<div class="bg-green-50 border border-green-200 rounded-lg p-6 text-center"><div class="text-green-800 text-xl font-semibold mb-2">🎉 Tutorial Complete!</div><p class="text-green-700">Excellent! You now understand all 5 pricing models.</p></div>';
                 };
             } else {
                 nextBtn.onclick = nextPricingModelsStep;
@@ -7632,7 +7635,7 @@
 
         let currentRiskManagementStep = 0;
 
-        function nextRiskManagementStep() {
+        window.nextRiskManagementStep = function() {
             const tutorial = tutorialContent['risk-management'];
             if (currentRiskManagementStep < tutorial.totalSteps - 1) {
                 currentRiskManagementStep++;
@@ -7640,7 +7643,7 @@
             }
         }
 
-        function previousRiskManagementStep() {
+        window.previousRiskManagementStep = function() {
             if (currentRiskManagementStep > 0) {
                 currentRiskManagementStep--;
                 updateRiskManagementStep();
@@ -7677,7 +7680,8 @@
             nextBtn.textContent = currentRiskManagementStep === tutorial.totalSteps - 1 ? "Complete!" : "Next →";
             if (currentRiskManagementStep === tutorial.totalSteps - 1) {
                 nextBtn.onclick = function() {
-                    alert("🎉 Outstanding! You've completed the Risk Management tutorial. You now understand how to protect your capital and manage multiple risk dimensions. These skills will help you become a consistently profitable trader!");
+                    // Show completion message in the UI
+                    document.getElementById('riskManagementStep').innerHTML = '<div class="bg-green-50 border border-green-200 rounded-lg p-6 text-center"><div class="text-green-800 text-xl font-semibold mb-2">🎉 Tutorial Complete!</div><p class="text-green-700">Outstanding! You now understand professional risk management.</p></div>';
                 };
             } else {
                 nextBtn.onclick = nextRiskManagementStep;
@@ -7766,6 +7770,85 @@
         let animationFrame;
         let isRotating = false;
 
+        // Create labeled axes for better understanding
+        function createLabeledAxes() {
+            // Create axis lines with arrows
+            const axisLength = 10;
+            const axisGeometry = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(0, 0, 0),
+                new THREE.Vector3(axisLength, 0, 0)
+            ]);
+            
+            // X-axis (Stock Price) - Red
+            const xAxisMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+            const xAxis = new THREE.Line(axisGeometry, xAxisMaterial);
+            scene.add(xAxis);
+            
+            // Y-axis (Time to Expiry) - Blue
+            const yAxisGeometry = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(0, 0, 0),
+                new THREE.Vector3(0, axisLength, 0)
+            ]);
+            const yAxisMaterial = new THREE.LineBasicMaterial({ color: 0x0000ff });
+            const yAxis = new THREE.Line(yAxisGeometry, yAxisMaterial);
+            scene.add(yAxis);
+            
+            // Z-axis (Greek Value) - Green
+            const zAxisGeometry = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(0, 0, 0),
+                new THREE.Vector3(0, 0, axisLength)
+            ]);
+            const zAxisMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+            const zAxis = new THREE.Line(zAxisGeometry, zAxisMaterial);
+            scene.add(zAxis);
+            
+            // Add text labels using HTML elements positioned over the 3D scene
+            addAxisLabels();
+        }
+        
+        function addAxisLabels() {
+            // Create HTML overlay for axis labels
+            const container = document.getElementById('threejs-container');
+            
+            // Remove any existing labels
+            const existingLabels = container.querySelectorAll('.axis-label');
+            existingLabels.forEach(label => label.remove());
+            
+            // X-axis label (Stock Price)
+            const xLabel = document.createElement('div');
+            xLabel.className = 'axis-label';
+            xLabel.innerHTML = 'Stock Price →';
+            xLabel.style.cssText = 'position: absolute; color: #ff4444; font-weight: bold; font-size: 14px; bottom: 45%; right: 10px; pointer-events: none; text-shadow: 0 0 3px rgba(0,0,0,0.8);';
+            container.appendChild(xLabel);
+            
+            // Y-axis label (Time to Expiry)
+            const yLabel = document.createElement('div');
+            yLabel.className = 'axis-label';
+            yLabel.innerHTML = '↑ Time to Expiry';
+            yLabel.style.cssText = 'position: absolute; color: #4444ff; font-weight: bold; font-size: 14px; top: 10px; left: 50%; transform: translateX(-50%); pointer-events: none; text-shadow: 0 0 3px rgba(0,0,0,0.8);';
+            container.appendChild(yLabel);
+            
+            // Z-axis label (Greek Value)
+            const zLabel = document.createElement('div');
+            zLabel.className = 'axis-label';
+            zLabel.innerHTML = '↗ Greek Value';
+            zLabel.style.cssText = 'position: absolute; color: #44ff44; font-weight: bold; font-size: 14px; top: 45%; left: 10px; pointer-events: none; text-shadow: 0 0 3px rgba(0,0,0,0.8);';
+            container.appendChild(zLabel);
+            
+            // Add scale indicators
+            const scaleInfo = document.createElement('div');
+            scaleInfo.className = 'axis-label';
+            scaleInfo.innerHTML = `
+                <div style="font-size: 11px; color: #ccc; line-height: 1.2;">
+                    <div>📈 X: Stock Price (60-140)</div>
+                    <div>⏰ Y: Time to Expiry (1-90 days)</div>  
+                    <div>📊 Z: Greek Value (varies)</div>
+                </div>
+            `;
+            scaleInfo.style.cssText = 'position: absolute; bottom: 10px; left: 10px; pointer-events: none; text-shadow: 0 0 3px rgba(0,0,0,0.8);';
+            container.appendChild(scaleInfo);
+        }
+
         function initialize3DVisualization() {
             const container = document.getElementById('threejs-container');
             const width = container.clientWidth;
@@ -7818,9 +7901,8 @@
             gridHelper.position.y = -5;
             scene.add(gridHelper);
 
-            // Add axis helpers
-            const axesHelper = new THREE.AxesHelper(10);
-            scene.add(axesHelper);
+            // Add labeled axis helpers
+            createLabeledAxes();
 
             // Start animation loop
             animate3D();
